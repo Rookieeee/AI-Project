@@ -30,7 +30,7 @@ uctNode::uctNode(int p, int c, uctNode* last, int total)
 	amafScore = 0.0;
 	lastMove = last;
 	opened = false;
-	//total_num_moves = total;
+	total_num_moves = total;
 }
 
 void uctNode::addPos(uctNode* p)
@@ -131,10 +131,7 @@ void uctNode::set_amaf(int result, const AmafBoard &amaf, bool side, int depth)
 	for (int i = 0; i < nextMove.size(); ++i) 
 	{
 		uctNode *next = nextMove[i];
-		if (next->color == BLACK && side == 0)
-			std::cerr << "error";
-		if (next->color == WHITE && side == 1)
-			std::cerr << "error";
+		
 		next->amafPlayResult += result * amaf.value(next->pos, depth, side, discount);
 		//std::cout << "??" << amaf.value(next->pos, depth, side, discount) << std::endl;
 		next->amafPlay += amaf.value(next->pos, depth, side, discount);
@@ -182,7 +179,7 @@ void uctNode::show_node(uctNode *node, int threshold,int depth)
 }
 void uctNode::show_node()
 {
-	int threshold = play / 300;
+	int threshold = play / 30;
 	show_node(this, threshold, 0);
 }
 

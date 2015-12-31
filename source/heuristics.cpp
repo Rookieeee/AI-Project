@@ -127,13 +127,13 @@ int GoBoard::capture_move(int bi, int bj, int color)
 	if (board[POS(bi, bj)]->get_liberties_number() != 1)
 		return -1;
 	int move = board[POS(bi,bj)]->liberties[0];
-
+	//if (!gains_liberty(move, board[POS(bi, bj)]))
+	//	return -1;
 	if (!available(I(move), J(move), color))
 		return -1;
-	if (is_virtual_eye(POS(bi, bj), color))
+	if (is_virtual_eye(move, color))
 		return -1;
-	if (!gains_liberty(move,board[POS(bi,bj)]))
-		return -1;
+
 	return move;
 }
 int GoBoard::capture_heuristic(int color)// sometimes check  the same string
@@ -148,19 +148,19 @@ int GoBoard::capture_heuristic(int color)// sometimes check  the same string
 		if (move != -1)
 			capture_moves[captures_moves_number++] = move;
 	}
-	//for (int i = 0; i < 8; ++i)
-	//{
-	//	int bi = I(last_point2) + around_i[i];
-	//	int bj = J(last_point2) + around_j[i];
-	//	int move = capture_move(bi, bj, color);
-	//	if (move != -1)
-	//		capture_moves[captures_moves_number++] = move;
-	//}
-	//int bi = rival_move_i;
-	//int bj = rival_move_j;
-	//int move = capture_move(bi, bj, color);
-	//if (move != -1)
-	//	capture_moves[captures_moves_number++] = move;
+	for (int i = 0; i < 8; ++i)
+	{
+		int bi = I(last_point2) + around_i[i];
+		int bj = J(last_point2) + around_j[i];
+		int move = capture_move(bi, bj, color);
+		if (move != -1)
+			capture_moves[captures_moves_number++] = move;
+	}
+	int bi = rival_move_i;
+	int bj = rival_move_j;
+	int move = capture_move(bi, bj, color);
+	if (move != -1)
+		capture_moves[captures_moves_number++] = move;
 	if (captures_moves_number)
 	{
 		return capture_moves[rand()*captures_moves_number / (RAND_MAX + 1)];

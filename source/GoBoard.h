@@ -80,7 +80,7 @@ public:
 	int valid_fixed_handicap(int handicap);
 	void place_fixed_handicap(int handicap);
 	void set_final_status_string(int pos, int status);
-	bool is_true_eye(int point, int color);
+
 
 	//int suicideLike(int i, int j, int color);
 	int select_and_play(int color);
