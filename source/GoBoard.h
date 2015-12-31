@@ -1,6 +1,7 @@
 #pragma once
 #include"constants.h"
 #include "string.h"
+#include "amaf.h"
 class GoBoard {
 private:
 
@@ -30,8 +31,7 @@ public:
 	int empty_points_number;
 	String* board[MAX_BOARD2];
 	String strings[MAX_BOARD2];
-	int discarded;
-	static double komi;
+	static float komi;
 	static int  I(int pos);
 	static int  J(int pos);
 	static int POS(int i, int  j);
@@ -72,7 +72,7 @@ public:
 	GoBoard * copy_board();
 	int generate_legal_moves(int* moves, int color);
 	//int autoRun(int color, bool* blackExist, bool* whiteExist);
-	int autoRun_fill_the_board(int color, bool* blackExist, bool* whiteExist);
+	int autoRun_fill_the_board(int color, bool* blackExist, bool* whiteExist, int*simul_len, AmafBoard* tamaf);
 	//void calcGame(int *b, int *w, int *bScore, int *wScore);
 	void compute_final_status(void);
 	int get_final_status(int i, int j);
@@ -80,7 +80,7 @@ public:
 	int valid_fixed_handicap(int handicap);
 	void place_fixed_handicap(int handicap);
 	void set_final_status_string(int pos, int status);
-	bool is_virtual_eye(int point, int color);
+	bool is_true_eye(int point, int color);
 
 	//int suicideLike(int i, int j, int color);
 	int select_and_play(int color);
@@ -105,12 +105,7 @@ public:
 	//int find_one_Liberty_for_atari2(int bi, int bj, bool*checked);
 	int capture_heuristic(int color);
 	int capture_move(int bi, int bj, int color);
-	int gains_liberty(int move, String * group);
-	int total_liberties(int point, int color, int *liberties, int enough, String *exclude);
-	int add_point(int *points, int points_number, int point);
-	int add_string(String * strings[], int strings_number, String* string);
-	bool is_legal(int point, int color);
-	int strings_in_atari(int point, int color, String*strings[],int string_number);
+	//int gains_liberty(int move, int color);
 	//int mogo_pattern_heuristic( int color);
 	//bool match_mogo_pattern(int bi, int bj, int color);
 	//bool match_hane(int bi, int bj, int color);
@@ -119,4 +114,11 @@ public:
 	//bool match_board_side(int bi, int bj, int color);
 
 	//bool GoBoard::is_self_atari(int point, int color);
+	int GoBoard::gains_liberty(int move, String* s);
+	int GoBoard::add_point(int *points, int points_number, int point);
+	int GoBoard::add_string(String * strings[], int strings_number, String* string);
+	int GoBoard::total_liberties(int point, int color, int *liberties, int enough, String *exclude);
+	bool GoBoard::is_virtual_eye(int point, int color);
+	bool GoBoard::is_legal(int point, int color);
+	int GoBoard::strings_in_atari(int point, int color, String*strings[], int string_number);
 };

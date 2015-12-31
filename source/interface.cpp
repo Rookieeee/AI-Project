@@ -91,7 +91,7 @@ GoBoard * main_go_board = NULL;
 GoEngine * main_engine = NULL;
 int _tmain(int argc, char** argv)
 {
-	unsigned int random_seed = 1;
+	unsigned int random_seed = time(0);
 	//ofstream outfile1("log3.txt");
 	//time_t m_time = time(NULL);
 	//tm* t = localtime(&m_time);
@@ -337,6 +337,7 @@ gtp_play(char *s)
 		return gtp_failure("GGGO v2.0 finds a rival's illegal move");
 
 	main_engine->go_board->play_move(i, j, color);
+	//main_engine->go_board->show_board();
 	return gtp_success("");
 }
 

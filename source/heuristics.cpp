@@ -128,7 +128,7 @@ int GoBoard::capture_move(int bi, int bj, int color)
 		return -1;
 	int move = board[POS(bi,bj)]->liberties[0];
 
-	if (!is_legal(move, color))
+	if (!available(I(move), J(move), color))
 		return -1;
 	if (is_virtual_eye(POS(bi, bj), color))
 		return -1;
@@ -161,10 +161,10 @@ int GoBoard::capture_heuristic(int color)// sometimes check  the same string
 	//int move = capture_move(bi, bj, color);
 	//if (move != -1)
 	//	capture_moves[captures_moves_number++] = move;
-	//if (captures_moves_number)
-	//{
-	//	return capture_moves[rand()*captures_moves_number / (RAND_MAX + 1)];
-	//}
+	if (captures_moves_number)
+	{
+		return capture_moves[rand()*captures_moves_number / (RAND_MAX + 1)];
+	}
 	return -1;
 }
 

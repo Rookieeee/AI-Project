@@ -6,7 +6,7 @@
 #include "algorithm"
 #include <vector>
 #include <fstream>
-#include "GoBoard.h"
+
 using namespace std;
 
 GoEngine::~GoEngine()
@@ -32,28 +32,28 @@ GoEngine * GoEngine::copy_engine(GoBoard *b)
 	return temp_engine;
 }
 
-uctNode* GoEngine::expand(uctNode* curNode, int* moves, int num_moves)
-{
-	for (int i = 0; i < num_moves; ++i)
-	{
-		bool flag = true;
-		for (int j = 0; j< (int)curNode->nextMove.size(); ++j)
-		{
-			if (moves[i] == curNode->nextMove[j]->pos)
-			{
-				flag = false;
-				break;
-			}
-		}
-		if (flag)//TODO
-		{
-			uctNode* nextchosenNode = new uctNode(moves[i], OTHER_COLOR(curNode->color), curNode);
-			curNode->addPos(nextchosenNode);
-			return nextchosenNode;
-		}
-	}
-	return NULL; //indicates error
-}
+//uctNode* GoEngine::expand(uctNode* curNode, int* moves, int num_moves)
+//{
+//	for (int i = 0; i < num_moves; ++i)
+//	{
+//		bool flag = true;
+//		for (int j = 0; j< (int)curNode->nextMove.size(); ++j)
+//		{
+//			if (moves[i] == curNode->nextMove[j]->pos)
+//			{
+//				flag = false;
+//				break;
+//			}
+//		}
+//		if (flag)//TODO
+//		{
+//			uctNode* nextchosenNode = new uctNode(moves[i], OTHER_COLOR(curNode->color), curNode);
+//			curNode->addPos(nextchosenNode);
+//			return nextchosenNode;
+//		}
+//	}
+//	return NULL; //indicates error
+//}
 
 
 void GoEngine::calScore(uctNode* tmp)
@@ -68,7 +68,9 @@ void GoEngine::calScore(uctNode* tmp)
 			tt->score = (tt->playResult + 0.0) / tt->play;
 
 		if (tt->amafPlay == 0)
+		{
 			tt->amafScore = 0;
+		}
 		else
 			tt->amafScore = (tt->amafPlayResult + 0.0) / tt->amafPlay;
 	}
@@ -78,68 +80,182 @@ void GoEngine::calScore(uctNode* tmp)
 
 
 
+//uctNode* GoEngine::bestchild(uctNode* curNode)
+//{
+//	if (curNode->nextMove.size() == 0)
+//		return NULL;
+//	calScore(curNode);
+//	double V = 5000;
+//	double alpha = V - curNode->nextMove[0]->play > 0 ? (V - curNode->nextMove[0]->play) / (V) : 0;
+//	//alpha = curNode->nextMove[0]->amafPlay *1.0 / (curNode->nextMove[0]->play + curNode->nextMove[0]->amafPlay);
+//	//alpha = 0.3;
+//	double tmpScore;
+//	double maxScore = alpha * curNode->nextMove[0]->amafScore + (1 - alpha)*curNode->nextMove[0]->score;
+//	uctNode* best = curNode->nextMove[0];
+//
+//	for (int i = 1; i < (int )curNode->nextMove.size(); ++i)
+//	{
+//		alpha = V - curNode->nextMove[i]->play > 0 ? (V - curNode->nextMove[i]->play) / (V) : 0;
+//		//alpha = curNode->nextMove[i]->amafPlay * 1.0 / (curNode->nextMove[i]->play + curNode->nextMove[i]->amafPlay);
+//		tmpScore = alpha * curNode->nextMove[i]->amafScore + (1 - alpha)*curNode->nextMove[i]->score;
+//		if (tmpScore > maxScore)
+//		{
+//			maxScore = tmpScore;
+//			best = curNode->nextMove[i];
+//		}
+//	}
+//
+//	return best;
+//}
+
 uctNode* GoEngine::bestchild(uctNode* curNode)
 {
 	if (curNode->nextMove.size() == 0)
-		return NULL;
-	calScore(curNode);
-	double V = MAXGAMES * 0.1;
-	double alpha = V - curNode->nextMove[0]->play > 0 ? (V - curNode->nextMove[0]->play) / (V) : 0;
-	double tmpScore;
-	double maxScore = alpha * curNode->nextMove[0]->amafScore + (1 - alpha)*curNode->nextMove[0]->score;
-	uctNode* best = curNode->nextMove[0];
-
-	for (int i = 1; i < (int )curNode->nextMove.size(); ++i)
 	{
-		alpha = V - curNode->nextMove[i]->play > 0 ? (V - curNode->nextMove[i]->play) / (V) : 0;
-		tmpScore = alpha * curNode->nextMove[i]->amafScore + (1 - alpha)*curNode->nextMove[i]->score;
+		cerr << "unexpected" << endl;
+		return NULL;
+	}
+	calScore(curNode);
+	const double BIAS = 1.0 / 3000000, UCTK = 0.0;
+
+
+	double tmpScore;
+	double maxScore = -1;
+	uctNode* best = NULL;
+
+	for (int i = 0; i < (int)curNode->nextMove.size(); ++i)
+	{
+//		cerr << curNode->nextMove[i]->pos << " ";
+		if (curNode->nextMove[i]->play)
+		{
+			if (curNode->nextMove[i]->amafPlay)
+			{
+				//cout << curNode->nextMove[i]->amafPlay << curNode->nextMove[i]->pos << endl;
+				double alpha = curNode->nextMove[i]->amafPlay / (curNode->nextMove[i]->amafPlay + curNode->nextMove[i]->play + curNode->nextMove[i]->amafPlay*curNode->nextMove[i]->play*BIAS);
+				tmpScore = alpha * curNode->nextMove[i]->amafScore + (1 - alpha)*curNode->nextMove[i]->score;
+			}
+			else
+				tmpScore = curNode->nextMove[i]->score;
+
+		}
+		else if (curNode->nextMove[i]->amafPlay)
+		{
+			//cerr << "??";
+			tmpScore = curNode->nextMove[i]->amafScore;
+		}
+		else
+		{
+			//cerr << curNode->nextMove[i]->pos << "!" <<endl;
+
+			tmpScore = 1;
+		}
+
 		if (tmpScore > maxScore)
 		{
 			maxScore = tmpScore;
 			best = curNode->nextMove[i];
+
 		}
 	}
-
+	/*cerr << endl;*/
+	//if (best->lastMove)
+	//	cerr << best->pos << " " << best->lastMove->pos << " " << maxScore << endl;
 	return best;
 }
-
 //
-uctNode* GoEngine::treePolicy(uctNode* v, int games)
+//uctNode* GoEngine::treePolicy(uctNode* v, int games, AmafBoard *tamaf)
+//{
+//	uctNode* curNode = v;
+//	int* moves = new int[MAX_BOARD * MAX_BOARD]; //available moves
+//	int num_moves;	//available moves_count
+//	while (curNode)
+//	{
+//		if (curNode->pos != POS(go_board->rival_move_i,go_board->rival_move_j))
+//		{
+//			go_board->play_move(I(curNode->pos), J(curNode->pos), curNode->color);
+//		}
+//		
+//		//if(curNode->total_num_moves = -1)
+//		//	curNode->total_num_moves = go_board->generate_legal_moves(moves, OTHER_COLOR(curNode->color));
+//		num_moves = go_board->generate_legal_moves(moves, OTHER_COLOR(curNode->color));
+//
+//		if (num_moves != curNode->nextMove.size()) //not fully expanded
+//		{
+//			uctNode* tmp = expand(curNode, moves, num_moves);
+//			delete[]moves;
+//			return tmp;
+//		}
+//		else
+//		{
+//			curNode = bestchild(curNode);
+//		}
+//	}
+//	delete[]moves;
+//	return curNode;
+//}
+uctNode* GoEngine::expand(uctNode* curNode, int* moves, int num_moves)
 {
-	uctNode* curNode = v;
-	int* moves = new int[MAX_BOARD * MAX_BOARD]; //available moves
-	int num_moves;	//available moves_count
-	while( curNode) //while not leaf node, or is root
+
+	for (int i = 0; i < num_moves; ++i)
 	{
-		if (curNode->pos != POS(go_board->rival_move_i,go_board->rival_move_j))
-		{
-			go_board->play_move(I(curNode->pos), J(curNode->pos), curNode->color);
-		}
-		num_moves = go_board->generate_legal_moves(moves, OTHER_COLOR(curNode->color));
-		if (num_moves != curNode->nextMove.size()) //not fully expanded
-		{
-			uctNode* tmp = expand(curNode, moves, num_moves);
-			delete[]moves;
-			return tmp;
-		}
-		else
-			curNode = bestchild(curNode);
+		uctNode *nextchosenNode = new uctNode(moves[i], OTHER_COLOR(curNode->color), curNode);
+		curNode->nextMove.push_back(nextchosenNode);
 	}
-	delete[]moves;
+
 	return curNode;
 }
-
-int GoEngine::defaultPolicy(GoBoard * temp, int color, bool* blackExist, bool* whiteExist)
+uctNode* GoEngine::treePolicy(uctNode* v, int games, int* sim, AmafBoard *tamaf, std::vector<uctNode*> *node_history)
 {
-
-	return temp->autoRun_fill_the_board (color, blackExist, whiteExist);
+	uctNode* curNode = v;
+	node_history->push_back(curNode);
+	int pass = 0;
+	while (curNode->nextMove.size() > 0 && pass < 2)
+	{
+		
+		curNode = bestchild(curNode);
+		if (!curNode)
+			cerr << "wt" << endl;
+		node_history->push_back(curNode);
+		int move = curNode->pos;
+		if (move < 0)
+			pass++;
+		else pass = 0;
+		go_board->play_move(I(move), J(move), curNode->color);
+		if (tamaf->side == 0 && curNode->color == BLACK)
+			cerr << "wrong side";
+		if (tamaf->side == 1 && curNode->color == WHITE)
+			cerr << "wrong side";
+		tamaf->play(move, ++(*sim));
+		
+		//cout << "here" << endl;
+	}
+	int EXPAND = 40;
+	if (curNode->play >= EXPAND || !curNode->lastMove)
+	{
+		int legal_moves[MAX_BOARD2];
+		int nlegal = go_board->generate_legal_moves(legal_moves, OTHER_COLOR(curNode->color));
+		expand(curNode, legal_moves, nlegal);
+	}
+	return curNode;
+}
+int GoEngine::defaultPolicy(GoBoard * temp, int color, bool* blackExist, bool* whiteExist, int*simulate_len, AmafBoard* tamaf)
+{
+	return temp->autoRun_fill_the_board (color, blackExist, whiteExist, simulate_len, tamaf);
 }
 
-
-
-void GoEngine::backup(uctNode* v, int reward, bool* blackExist, bool* whiteExist)
+void GoEngine::back_up_results(int result, std::vector<uctNode*> node_history, int nnodes, bool side, AmafBoard* tamaf)
 {
-	v->result(reward, blackExist, whiteExist);
+	for (int i = 0; i < nnodes; i++) {
+		node_history[i]->set_results(1 - result);
+		node_history[i]->set_amaf(result, *tamaf, side, i + 1);
+		side = !side;
+		result = 1 - result;
+	}
+}
+
+void GoEngine::backup(uctNode* v, int reward, bool* blackExist, bool* whiteExist, int simulate_len, AmafBoard* tamaf)
+{
+	v->result(reward, blackExist, whiteExist, simulate_len, tamaf);
 }
 
 
@@ -179,18 +295,40 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 	param * temp_p = (param *)p;
 	GoEngine * engine = temp_p->go_engine;
 	GoEngine * temp_engine = engine->copy_engine(engine->go_board); // remember to delete
-	temp_engine->go_board->discarded = 0;
 	uctNode* root = new uctNode(temp_engine->go_board->POS(temp_engine->go_board->rival_move_i, temp_engine->go_board->rival_move_j), OTHER_COLOR(temp_engine->move_color), NULL);
 	int reward = 0;
 
+
 	while (/*temp_engine->games < MAXGAMES||*/(clock()-temp_engine->fin_clock)<MAXTIME  )  ///visit engine-> games may cause problem, we need to add lock,  or just use time information rather than games information
 	{
-		uctNode* chosenNode = temp_engine->treePolicy(root, temp_engine->games);//treePolicy's engine->games parameter no used?
+		std::vector<uctNode*> node_history;
+
+		int simulate_len = 0;
+		AmafBoard tamaf = AmafBoard(170);
+		bool side;
+		if (temp_engine->move_color == BLACK)
+			side = 1;
+		else
+			side = 0;
+		tamaf.set_up(side, 170);
+
+		//TODO
+		uctNode* chosenNode = temp_engine->treePolicy(root, temp_engine->games, &simulate_len, &tamaf, &node_history);//treePolicy's engine->games parameter no used?
+		//cout << "size of node_history:" << node_history.size();
+
 		if (!chosenNode)
+		{
+			cerr << "No chosenNode";
 			break;
-
-		temp_engine->go_board->play_move(I(chosenNode->pos), J(chosenNode->pos), chosenNode->color);
-
+		}
+		//cerr << chosenNode->color << "*" << tamaf.side;
+		//if (temp_engine->go_board->on_board(I(chosenNode->pos), J(chosenNode->pos)) && temp_engine->go_board->get_board(I(chosenNode->pos), J(chosenNode->pos)) == EMPTY)
+		//{
+		//	cerr << chosenNode->pos;
+		//	temp_engine->go_board->play_move(I(chosenNode->pos), J(chosenNode->pos), chosenNode->color);
+		//	tamaf.play(chosenNode->pos, ++simulate_len);
+		//}
+		
 		bool* blackExist = new bool[GoBoard::board_size*GoBoard::board_size];
 		bool* whiteExist = new bool[GoBoard::board_size*GoBoard::board_size];
 		for (int ii = 0; ii < GoBoard::board_size*GoBoard::board_size; ++ii)
@@ -198,11 +336,13 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 			blackExist[ii] = 0;
 			whiteExist[ii] = 0;
 		}
-		reward = temp_engine->defaultPolicy(temp_engine->go_board, OTHER_COLOR(chosenNode->color), blackExist, whiteExist);
-		temp_engine->backup(chosenNode, reward, blackExist, whiteExist);
+		if (chosenNode->color == BLACK && tamaf.side == 1)
+			cerr << "???";
+		if (chosenNode->color == WHITE && tamaf.side == 0)
+			cerr << "???";
+		reward = temp_engine->defaultPolicy(temp_engine->go_board, OTHER_COLOR(chosenNode->color), blackExist, whiteExist, &simulate_len, &tamaf);
+		//cout << simulate_len << "here" << endl;
 
-		delete []blackExist;
-		delete []whiteExist;
 		++temp_engine->games;
 		for (int i = 0; i < GoBoard::board_size2; ++i)
 		{
@@ -246,9 +386,34 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		//temp_engine->go_board->rival_move_j = engine->go_board->rival_move_j;
 
 		//go_board = store->copy_board();
+		if (reward == -1)
+		{
+			cerr << "not finished";
+			delete[]blackExist;
+			delete[]whiteExist;
+			continue;
+		}
+
+		//temp_engine->backup(chosenNode, reward, blackExist, whiteExist, depth, &tamaf);
+
+		if (chosenNode->color == root->color)
+			reward = 1 - reward;
+		uctNode* test = chosenNode;
+		int len = node_history.size();
+		while (test)
+		{
+			if (test != node_history[len - 1])
+				cerr << "his error";
+			test = test->lastMove;
+			--len;
+		}
+		temp_engine->back_up_results(reward, node_history, node_history.size(), side, &tamaf);
+
+		delete[]blackExist;
+		delete[]whiteExist;
 	}
+
 	printf("%d\n", temp_engine->games);
-	printf("%d\n", temp_engine->go_board->discarded);
 	engine->roots[temp_p->thread_id] = root;
 	delete temp_engine;
 	return 0;
@@ -315,6 +480,7 @@ void GoEngine::uctSearch(int *pos, int color, int *moves, int num_moves)
 			if (votes[i] > final_most_votes)
 			{
 				final_most_votes = votes[i];
+				
 				final_most_votes_move = i;
 				have_same_votes = 0;
 			}
@@ -349,7 +515,7 @@ void GoEngine::uctSearch(int *pos, int color, int *moves, int num_moves)
 	{
 		(*pos) = -1;
 	}
-
+	
 	delete []votes;
 	delete []visits;
 	for (int i = 0; i < THREAD_NUM; ++i)
@@ -367,6 +533,7 @@ void GoEngine::aiMove(int *pos, int color, int *moves, int num_moves)
 	//if (*pos == -1)
 	//	aiMoveStart(pos, color);
 	//if (*pos == -1)
+
 		uctSearch(pos, color, moves, num_moves);
 }
 
@@ -481,49 +648,11 @@ void GoEngine::generate_move(int *i, int *j, int color)
 	{
 		*i = -1;
 		*j = -1;
-		go_board->show_board();
+		//go_board->show_board();
 		return;
 	}
 }
-//void GoEngine::generate_move(int *i, int *j, int color)
-//{
-//	move_color = color;
-//	uctNode* root = new uctNode(go_board->POS(go_board->rival_move_i, go_board->rival_move_j), OTHER_COLOR(move_color), NULL);
-//	InitializeCriticalSection(&cs);
-//	HANDLE handles[THREAD_NUM];
-//	for (int i = 0; i < THREAD_NUM; ++i)
-//	{
-//		handles[i] = (HANDLE)_beginthreadex(NULL, 0, GoEngine::ThreadFun, (void*)this, 0, 0);
-//	}
-//	WaitForMultipleObjects(THREAD_NUM, handles, TRUE, INFINITE);
-//	DeleteCriticalSection(&cs);
-//	root->show_node();
-//	double visit = 0;
-//	int best = -1;
-//	for (int i = 0; i < root->nextMove.size(); ++i)
-//	{
-//		double curvisits = root->nextMove[i]->play + root->nextMove[i]->amafPlay;
-//		if (curvisits > visit)
-//		{
-//			best = root->nextMove[i]->pos;
-//			visit = curvisits;
-//		}
-//	}
-//	if (best == -1)
-//	{
-//		(*i) = -1;
-//		(*j) = -1;
-//		return;
-//	}
-//	else
-//	{
-//		*i = I(best);
-//		*j = J(best);
-//	}
-//	
-//
-//
-//}
+
 
 /* Put free placement handicap stones on the board. We do this simply
 * by generating successive black moves.

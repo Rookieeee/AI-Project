@@ -4,11 +4,12 @@
 #include "GoEngine.h"
 #include <fstream>
 
+
 using namespace std;
 
 int GoBoard::board_size = 13;
 int GoBoard::board_size2 = board_size*board_size;
-double  GoBoard::komi = 6.5;
+float GoBoard::komi = 6.5;
 int GoBoard::handicap = 0;
 int GoBoard::final_status[MAX_BOARD2];
 int GoBoard::deltai[4] = {-1, 1, 0, 0};
@@ -992,15 +993,14 @@ int GoBoard::random_legal_move(int color)
 {
 
 	int pos = rand()*board_size2 / (RAND_MAX + 1);
-
 	for (int i = pos; i < board_size2; ++i)
 	{
-		if (available(I(i), J(i), color))
+		if (available(I(i), J(i), color) &&!is_virtual_eye( i,color) )
 			return i;
 	}
 	for (int i = 0; i < pos; ++i)
 	{
-		if (available(I(i), J(i), color))
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color) )
 			return i;
 	}
 	return -1;
@@ -1091,7 +1091,7 @@ int GoBoard::select_and_play(int color)
 
 bool GoBoard::is_surrounded(int point, int color)
 {
-	if (!board[point])
+	if (board[point])
 		return false;
 	int ai = I(point);
 	int aj = J(point);
@@ -1129,11 +1129,12 @@ double GoBoard::chinese_count()
 	return eyes_result + black_score - white_score - komi;
 }
 
-int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist)
+int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist, int*simul_len, AmafBoard* tamaf)
 {
 	if (color != BLACK && color != WHITE) return -1;
 	int pass = 0;
 	int iterstep = step;
+
 	if (color == BLACK)
 	{
 		while (pass < 2)
@@ -1143,17 +1144,33 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				blackExist[move] = 1;
+				if (tamaf->side == 0)
+					cerr << "wrong side1";
+
+				tamaf->play(move, ++(*simul_len));
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 			move = select_and_play(OTHER_COLOR(color));
 
 			if (move != -1)
 			{
 				whiteExist[move] = 1;
+				if (tamaf->side == 1)
+					cerr << "wrong side2";
+				tamaf->play(move, ++(*simul_len));
+
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 
 			if (iterstep > 3*board_size*board_size)
 				return -1;
@@ -1169,23 +1186,40 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				whiteExist[move] = 1;
+				if (tamaf->side == 1)
+					cerr << "wrong side3";
+				tamaf->play(move, ++(*simul_len));
+
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 			move = select_and_play(OTHER_COLOR(color));
 
 			if (move != -1)
 			{
 				blackExist[move] = 1;
+				if (tamaf->side == 0)
+					cerr << "wrong side4";
+				tamaf->play(move, ++(*simul_len));
+
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
+
 			if (iterstep > 3*board_size*board_size)
 				return -1;
 		}
 	}
 	double count = chinese_count();
-
+	//cout << *simul_len << "?" << endl;
 	if (count > 0 && color == WHITE)
 	{
 		return 1;
