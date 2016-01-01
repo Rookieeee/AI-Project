@@ -170,7 +170,7 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 //	int num_moves;	//available moves_count
 //	while (curNode)
 //	{
-//		if (curNode->pos != POS(go_board->rival_move_i,go_board->rival_move_j))
+//		if (curNode->pos != last_point)
 //		{
 //			go_board->play_move(I(curNode->pos), J(curNode->pos), curNode->color);
 //		}
@@ -295,7 +295,7 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 	param * temp_p = (param *)p;
 	GoEngine * engine = temp_p->go_engine;
 	GoEngine * temp_engine = engine->copy_engine(engine->go_board); // remember to delete
-	uctNode* root = new uctNode(temp_engine->go_board->POS(temp_engine->go_board->rival_move_i, temp_engine->go_board->rival_move_j), OTHER_COLOR(temp_engine->move_color), NULL);
+	uctNode* root = new uctNode(temp_engine->go_board->last_point, OTHER_COLOR(temp_engine->move_color), NULL);
 	int reward = 0;
 
 
@@ -365,8 +365,6 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		{
 			temp_engine->go_board->empty_points[i] = engine->go_board->empty_points[i];
 		}
-		temp_engine->go_board->rival_move_i = engine->go_board->rival_move_i;
-		temp_engine->go_board->rival_move_j = engine->go_board->rival_move_j;
 		temp_engine->go_board->ko_i = engine->go_board->ko_i;
 		temp_engine->go_board->ko_j = engine->go_board->ko_j;
 		temp_engine->go_board->step = engine->go_board->step;
@@ -382,8 +380,6 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		//temp_engine->go_board->step = engine->go_board->step;
 		//temp_engine->go_board->ko_i = engine->go_board->ko_i;
 		//temp_engine->go_board->ko_j = engine->go_board->ko_j;
-		//temp_engine->go_board->rival_move_i = engine->go_board->rival_move_i;
-		//temp_engine->go_board->rival_move_j = engine->go_board->rival_move_j;
 
 		//go_board = store->copy_board();
 		if (reward == -1)
@@ -531,35 +527,33 @@ void GoEngine::aiMove(int *pos, int color, int *moves, int num_moves)
 {
 	//aiMovePreCheck(pos, color, moves, num_moves);
 	//if (*pos == -1)
-	//	aiMoveStart(pos, color);
-	//if (*pos == -1)
-
+	aiMoveStart(pos, color);
+	if (*pos == -1)
 		uctSearch(pos, color, moves, num_moves);
 }
 
-//void GoEngine::aiMoveStart(int *pos, int color)
-//{
-//	if (go_board->step < MAX_BEGINING)
-//	{
-//		int move;
-//		int rival_move = POS(go_board->rival_move_i, go_board->rival_move_j);
-//
-//		move = go_board->is_xiaomu_available(color, rival_move);
-//		if (move != -1) { *pos = move; return; }
-//		move = go_board->is_anti_kakari_available(color, rival_move);
-//		if (move != -1) { *pos = move; return; }
-//		move = go_board->is_anti_yijianjia_available(color, rival_move);
-//		if (move != -1) { *pos = move; return; }
-//		move = go_board->is_anti_dian33_available(color, rival_move);
-//		if (move != -1) { *pos = move; return; }
-//		move = go_board->is_star_available(color, rival_move);
-//		if (move != -1) { *pos = move; return; }
-//		move = go_board->is_kakari_available(color, rival_move);
-//		if (move != -1) { *pos = move; return; }
-//	}
-//	*pos = -1;
-//	return;
-//}
+void GoEngine::aiMoveStart(int *pos, int color)
+{
+	if (go_board->step < MAX_BEGINING)
+	{
+		int move;
+
+		move = go_board->is_xiaomu_available(color, go_board->last_point);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->is_anti_kakari_available(color, go_board->last_point);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->is_anti_yijianjia_available(color, go_board->last_point);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->is_anti_dian33_available(color, go_board->last_point);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->is_star_available(color, go_board->last_point);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->is_kakari_available(color, go_board->last_point);
+		if (move != -1) { *pos = move; return; }
+	}
+	*pos = -1;
+	return;
+}
 
 /* Generate a move. */
 void GoEngine::generate_move(int *i, int *j, int color)
@@ -700,9 +694,9 @@ void GoEngine::place_free_handicap(int handicap)
 //	int storeko_i = go_board->ko_i;
 //	int storeko_j = go_board->ko_j;
 //	int other = OTHER_COLOR(color);
-//	for (int i = max(0, go_board->rival_move_i - PRECHECKRANGE); i <= (GoBoard::board_size - 1, go_board->rival_move_i + PRECHECKRANGE); ++i)
+//	for (int i = max(0, I(go_board->last_point) - PRECHECKRANGE); i <= (GoBoard::board_size - 1, I(go_board->last_point) + PRECHECKRANGE); ++i)
 //	{
-//		for (int j = max(0,go_board->rival_move_j- PRECHECKRANGE); j <= (GoBoard::board_size - 1, go_board->rival_move_j + PRECHECKRANGE); ++j)
+//		for (int j = max(0,J(go_board->last_point)- PRECHECKRANGE); j <= (GoBoard::board_size - 1, J(go_board->last_point) + PRECHECKRANGE); ++j)
 //		{
 //			if (go_board->on_board(i, j) && go_board->get_board(i, j) == color)
 //			{

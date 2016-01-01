@@ -39,8 +39,6 @@ public:
 	static int deltaj[4];
 	static int board_size;
 	static int board_size2;
-	int rival_move_i;
-	int rival_move_j;
 	int ko_i;
 	int ko_j;
 	int step;
@@ -88,16 +86,16 @@ public:
 	double chinese_count();
 	bool is_surrounded(int point, int color);
 
-	////int is_heuristic_available(int color, int rival_move);
-	//int is_star_available(int color, int last_moves);
-	//int is_xiaomu_available(int color, int rival_move);
-	//int is_anti_kakari_available(int color, int rival_move);
-	//int is_anti_yijianjia_available(int color, int rival_move);
-	//int is_anti_dian33_available(int color, int rival_move);
-	//int is_kakari_available(int color, int rival_move);
+	////int is_heuristic_available(int color, int last_point);
+	int is_star_available(int color, int last_point);
+	int is_xiaomu_available(int color, int last_point);
+	int is_anti_kakari_available(int color, int last_point);
+	int is_anti_yijianjia_available(int color, int last_point);
+	int is_anti_dian33_available(int color, int last_point);
+	int is_kakari_available(int color, int last_point);
+	int relative_point(int pos, int di, int dj);
 
-	//bool heavy_policy(int point, int  side);
-	//bool is_virtual_eye(int point, int color);
+	bool heavy_policy(int point, int  side);
 	//int check_one_Liberty(int i, int j);
 	//int find_one_Liberty_for_atari(int i, int j);
 	//int last_atari_heuristic( int color);
@@ -113,7 +111,7 @@ public:
 	//bool match_cut2(int bi, int bj, int color);
 	//bool match_board_side(int bi, int bj, int color);
 
-	//bool GoBoard::is_self_atari(int point, int color);
+	bool GoBoard::is_self_atari(int point, int color);
 	int GoBoard::gains_liberty(int move, String* s);
 	int GoBoard::add_point(int *points, int points_number, int point);
 	int GoBoard::add_string(String * strings[], int strings_number, String* string);

@@ -26,8 +26,6 @@ int GoBoard::J(int pos) { return ((pos) % board_size); }
 
 GoBoard::GoBoard()
 {
-	rival_move_i = -1;
-	rival_move_j = -1;
 	 ko_i = -1;
 	 ko_j = -1;
 	 step = 0;
@@ -106,12 +104,8 @@ void GoBoard::play_move(int i, int j, int color)
 	{
 		last_point2 = last_point;
 		last_point = -1;
-		rival_move_i = -1;
-		rival_move_j = -1;
 		return;
 	}
-	rival_move_i = i;
-	rival_move_j = j;
 	last_point2 = last_point;
 	last_point = pos;
 	/* If the move is a suicide we only need to remove the adjacent
@@ -296,8 +290,6 @@ GoBoard * GoBoard::copy_board()
 	{
 		temp->empty_points[i] = empty_points[i];
 	}
-	temp->rival_move_i = rival_move_i;
-	temp->rival_move_j = rival_move_j;
 	temp->ko_i = ko_i;
 	temp->ko_j = ko_j;
 	temp->step = step;
@@ -349,8 +341,6 @@ void GoBoard::clear_board()
 		board[i] = NULL;
 		strings[i].clear();
 	}
-	rival_move_i = -1;
-	rival_move_j = -1;
 	ko_i = -1;
 	ko_j = -1;
 	step = 0;

@@ -67,14 +67,14 @@
 //
 //int GoBoard::last_atari_heuristic( int color)
 //{
-//	if (rival_move_i == -1)
+//	if (last_point) == -1)
 //		return -1;
 //
 //	int saves[169];
 //	int saves_number = 0;
 //	for (int i = 0; i < 4; ++i) {									//check whether there is a atari
-//		int neighbor_i = rival_move_i + deltai[i];
-//		int neighbor_j = rival_move_j + deltaj[i];
+//		int neighbor_i = I(last_point) + deltai[i];
+//		int neighbor_j = J(last_point) + deltaj[i];
 //		if (!on_board(neighbor_i, neighbor_j))
 //			continue;
 //		if (get_board(neighbor_i, neighbor_j) == color)
@@ -142,8 +142,8 @@ int GoBoard::capture_heuristic(int color)// sometimes check  the same string
 	int captures_moves_number = 0;
 	for (int i = 0; i < 8; ++i)
 	{
-		int bi = rival_move_i + around_i[i];
-		int bj = rival_move_j + around_j[i];
+		int bi = I(last_point) + around_i[i];
+		int bj = J(last_point) + around_j[i];
 		int move = capture_move(bi, bj, color);
 		if (move != -1)
 			capture_moves[captures_moves_number++] = move;
@@ -156,8 +156,8 @@ int GoBoard::capture_heuristic(int color)// sometimes check  the same string
 		if (move != -1)
 			capture_moves[captures_moves_number++] = move;
 	}
-	int bi = rival_move_i;
-	int bj = rival_move_j;
+	int bi = I(last_point);
+	int bj = J(last_point);
 	int move = capture_move(bi, bj, color);
 	if (move != -1)
 		capture_moves[captures_moves_number++] = move;
@@ -635,8 +635,8 @@ int GoBoard::capture_heuristic(int color)// sometimes check  the same string
 //	int matches_number = 0;
 //	for (int i = 0; i < 8; ++i)
 //	{
-//		int bi = rival_move_i + around_i[i];
-//		int bj = rival_move_j + around_j[i];
+//		int bi = I(last_point) + around_i[i];
+//		int bj = J(last_point) + around_j[i];
 //		if (!on_board(bi, bj))
 //			continue;
 //		if (get_board(bi, bj) != EMPTY)
