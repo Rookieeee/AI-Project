@@ -18,7 +18,7 @@ uctNode* uctNode::copy()
 	return tmp;
 }
 
-uctNode::uctNode(int p, int c, uctNode* last, int total)
+uctNode::uctNode(int p, int c, uctNode* last)
 {
 	play = 0;
 	playResult = 0;
@@ -30,7 +30,6 @@ uctNode::uctNode(int p, int c, uctNode* last, int total)
 	amafScore = 0.0;
 	lastMove = last;
 	opened = false;
-	//total_num_moves = total;
 }
 
 void uctNode::addPos(uctNode* p)
@@ -46,79 +45,6 @@ uctNode::~uctNode()
 	}
 }
 
-//void Node::set_amaf(int result, const AmafBoard &amaf, bool side, int depth)
-//{
-//	const double discount = 0.0001; //0.0001;
-//	for (Node *next = child; next; next = next->sibling) {
-//		next->rave_results += result * amaf.value(next->move, depth, side, discount);
-//		next->rave_visits += amaf.value(next->move, depth, side, discount);
-//	}
-//}
-
-//playresult only +
-void uctNode::result(int r, bool* blackExist, bool* whiteExist, int simul, AmafBoard* tamaf)
-{
-	//uctNode *p = this;
-	//uctNode * tmp;
-	//int color = p->color;
-
-	//int depth = simul;
-	//int side;
-	//if (color == BLACK)
-	//	side = 1;
-	//else
-	//	side = 0;
-	//while (p)
-	//{
-	//	tmp = p;
-	//	++(p->play);
-	//	if (p->color == color)
-	//		p->playResult += r;
-	//	else p->playResult += (1 - r);
-	//	p = p->lastMove;
-	//	
-	//	//new
-	//	if (!p)
-	//		break;
-	//	if (p->color == 1) //white
-	//	{
-	//		//child is black
-	//		for (int i = 0; i < p->nextMove.size(); ++i)
-	//		{
-	//			if (blackExist[p->nextMove[i]->pos] && p->nextMove[i] != tmp)
-	//			{
-	//				//++(p->nextMove[i]->amafPlay);
-	//				p->nextMove[i]->amafPlay += tamaf->value(p->nextMove[i]->pos, depth, 1, 0.0001);
-	//				if(p->nextMove[i]->color == color)
-	//					//p->nextMove[i]->amafPlayResult += r;
-	//					p->nextMove[i]->amafPlayResult += r * tamaf->value(p->nextMove[i]->pos, depth, 1, 0.0001);
-	//				else
-	//					p->nextMove[i]->amafPlayResult += (1 - r) * tamaf->value(p->nextMove[i]->pos, depth, 1, 0.0001);
-	//			}
-	//		}
-	//	}
-	//	else //black
-	//	{
-	//		//child is white
-	//		for (int i = 0; i < p->nextMove.size(); ++i)
-	//		{
-	//			if (whiteExist[p->nextMove[i]->pos] && p->nextMove[i] != tmp)
-	//			{
-	//				//++(p->nextMove[i]->amafPlay);
-	//				p->nextMove[i]->amafPlay += tamaf->value(p->nextMove[i]->pos, depth, 0, 0.0001);
-	//				if (p->nextMove[i]->color == color)
-	//					//p->nextMove[i]->amafPlayResult += r;
-	//					p->nextMove[i]->amafPlayResult += r * tamaf->value(p->nextMove[i]->pos, depth, 0, 0.0001);
-	//				else 
-	//					p->nextMove[i]->amafPlayResult += (1 - r) * tamaf->value(p->nextMove[i]->pos, depth, 0, 0.0001);
-	//			}
-	//		}
-	//	}
-	//	--depth;
-
-	//}
-}
-
 void uctNode::set_results(int result)
 {
 	play++;
@@ -131,14 +57,12 @@ void uctNode::set_amaf(int result, const AmafBoard &amaf, bool side, int depth)
 	for (int i = 0; i < nextMove.size(); ++i) 
 	{
 		uctNode *next = nextMove[i];
-		if (next->color == BLACK && side == 0)
-			std::cerr << "error";
-		if (next->color == WHITE && side == 1)
-			std::cerr << "error";
+		//if (next->color == BLACK && side == 0)
+		//	std::cerr << "error";
+		//if (next->color == WHITE && side == 1)
+		//	std::cerr << "error";
 		next->amafPlayResult += result * amaf.value(next->pos, depth, side, discount);
-		//std::cout << "??" << amaf.value(next->pos, depth, side, discount) << std::endl;
 		next->amafPlay += amaf.value(next->pos, depth, side, discount);
-		//std::cout << next->amafPlay << "amafplay ";
 	}
 }
 
@@ -185,45 +109,3 @@ void uctNode::show_node()
 	int threshold = play / 300;
 	show_node(this, threshold, 0);
 }
-
-//playResult can be -/+
-//void uctNode::result(int r, bool* blackExist, bool* whiteExist)
-//{
-//	uctNode *p = this;
-//	uctNode * tmp;
-//	while (p)
-//	{
-//		tmp = p;
-//		++(p->play);
-//		p->playResult += r;
-//		p = p->lastMove;
-//		//new
-//		if (!p)
-//			break;
-//		if (p->color == 1) //white
-//		{
-//			//child is black
-//			for (int i = 0; i < p->nextMove.size(); ++i)
-//			{
-//				if (blackExist[p->nextMove[i]->pos] && p->nextMove[i] != tmp)
-//				{
-//					++(p->nextMove[i]->amafPlay);
-//					p->nextMove[i]->amafPlayResult += r;
-//				}
-//			}
-//		}
-//		else //black
-//		{
-//			//child is white
-//			for (int i = 0; i < p->nextMove.size(); ++i)
-//			{
-//				if (whiteExist[p->nextMove[i]->pos] && p->nextMove[i] != tmp)
-//				{
-//					++(p->nextMove[i]->amafPlay);
-//					p->nextMove[i]->amafPlayResult += r;
-//				}
-//			}
-//		}
-//
-//	}
-//}

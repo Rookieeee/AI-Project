@@ -5,7 +5,6 @@
 #include "amaf.h"
 class uctNode{
 public:
-	//int total_num_moves;
 	int play;
 	int playResult;
 	double amafPlay;
@@ -17,10 +16,10 @@ public:
 	double amafScore;
 	std::vector<uctNode*> nextMove;
 	uctNode* lastMove;
-	uctNode(int p, int c, uctNode *last, int total = -1);
+	uctNode(int p, int c, uctNode *last);
 	~uctNode();
 	void addPos(uctNode* p);
-	void result(int r, bool* blackExist, bool* whiteExist, int simul, AmafBoard* tamaf);
+	//void result(int r, bool* blackExist, bool* whiteExist, int simul, AmafBoard* tamaf);
 	uctNode* copy();
 	void show_node();
 	void show_node(uctNode *node, int threshold, int depth);

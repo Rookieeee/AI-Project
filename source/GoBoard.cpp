@@ -1192,9 +1192,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				blackExist[move] = 1;
-				if (tamaf->side == 0)
-					cerr << "wrong side1";
-
 				tamaf->play(move, ++(*simul_len));
 				pass = 0;
 			}
@@ -1208,8 +1205,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				whiteExist[move] = 1;
-				if (tamaf->side == 1)
-					cerr << "wrong side2";
 				tamaf->play(move, ++(*simul_len));
 
 				pass = 0;
@@ -1234,8 +1229,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				whiteExist[move] = 1;
-				if (tamaf->side == 1)
-					cerr << "wrong side3";
 				tamaf->play(move, ++(*simul_len));
 
 				pass = 0;
@@ -1250,8 +1243,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				blackExist[move] = 1;
-				if (tamaf->side == 0)
-					cerr << "wrong side4";
 				tamaf->play(move, ++(*simul_len));
 
 				pass = 0;
