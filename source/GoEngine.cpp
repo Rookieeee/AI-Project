@@ -110,11 +110,11 @@ void GoEngine::calScore(uctNode* tmp)
 
 uctNode* GoEngine::bestchild(uctNode* curNode)
 {
-	if (curNode->nextMove.size() == 0)
-	{
-		cerr << "unexpected" << endl;
-		return NULL;
-	}
+	//if (curNode->nextMove.size() == 0)
+	//{
+	//	cerr << "unexpected" << endl;
+	//	return NULL;
+	//}
 	calScore(curNode);
 	const double BIAS = 1.0 / 3000000, UCTK = 0.0;
 
@@ -146,7 +146,6 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 		else
 		{
 			//cerr << curNode->nextMove[i]->pos << "!" <<endl;
-
 			tmpScore = 1;
 		}
 
@@ -157,9 +156,7 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 
 		}
 	}
-	/*cerr << endl;*/
-	//if (best->lastMove)
-	//	cerr << best->pos << " " << best->lastMove->pos << " " << maxScore << endl;
+
 	return best;
 }
 //
@@ -213,18 +210,18 @@ uctNode* GoEngine::treePolicy(uctNode* v, int games, int* sim, AmafBoard *tamaf,
 	{
 		
 		curNode = bestchild(curNode);
-		if (!curNode)
-			cerr << "wt" << endl;
+		//if (!curNode)
+		//	cerr << "wt" << endl;
 		node_history->push_back(curNode);
 		int move = curNode->pos;
 		if (move < 0)
 			pass++;
 		else pass = 0;
 		go_board->play_move(I(move), J(move), curNode->color);
-		if (tamaf->side == 0 && curNode->color == BLACK)
-			cerr << "wrong side";
-		if (tamaf->side == 1 && curNode->color == WHITE)
-			cerr << "wrong side";
+		//if (tamaf->side == 0 && curNode->color == BLACK)
+		//	cerr << "wrong side";
+		//if (tamaf->side == 1 && curNode->color == WHITE)
+		//	cerr << "wrong side";
 		tamaf->play(move, ++(*sim));
 		
 		//cout << "here" << endl;
@@ -253,10 +250,10 @@ void GoEngine::back_up_results(int result, std::vector<uctNode*> node_history, i
 	}
 }
 
-void GoEngine::backup(uctNode* v, int reward, bool* blackExist, bool* whiteExist, int simulate_len, AmafBoard* tamaf)
-{
-	v->result(reward, blackExist, whiteExist, simulate_len, tamaf);
-}
+//void GoEngine::backup(uctNode* v, int reward, bool* blackExist, bool* whiteExist, int simulate_len, AmafBoard* tamaf)
+//{
+//	v->result(reward, blackExist, whiteExist, simulate_len, tamaf);
+//}
 
 
 /*unsigned __stdcall GoEngine::ThreadFunc(void * p)
@@ -336,10 +333,10 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 			blackExist[ii] = 0;
 			whiteExist[ii] = 0;
 		}
-		if (chosenNode->color == BLACK && tamaf.side == 1)
-			cerr << "???";
-		if (chosenNode->color == WHITE && tamaf.side == 0)
-			cerr << "???";
+		//if (chosenNode->color == BLACK && tamaf.side == 1)
+		//	cerr << "???";
+		//if (chosenNode->color == WHITE && tamaf.side == 0)
+		//	cerr << "???";
 		reward = temp_engine->defaultPolicy(temp_engine->go_board, OTHER_COLOR(chosenNode->color), blackExist, whiteExist, &simulate_len, &tamaf);
 		//cout << simulate_len << "here" << endl;
 
@@ -394,15 +391,15 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 
 		if (chosenNode->color == root->color)
 			reward = 1 - reward;
-		uctNode* test = chosenNode;
-		int len = node_history.size();
-		while (test)
-		{
-			if (test != node_history[len - 1])
-				cerr << "his error";
-			test = test->lastMove;
-			--len;
-		}
+		//uctNode* test = chosenNode;
+		//int len = node_history.size();
+		//while (test)
+		//{
+		//	if (test != node_history[len - 1])
+		//		cerr << "his error";
+		//	test = test->lastMove;
+		//	--len;
+		//}
 		temp_engine->back_up_results(reward, node_history, node_history.size(), side, &tamaf);
 
 		delete[]blackExist;
