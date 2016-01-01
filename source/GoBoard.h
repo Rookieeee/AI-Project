@@ -98,10 +98,11 @@ public:
 	bool heavy_policy(int point, int  side);
 	//int check_one_Liberty(int i, int j);
 	//int find_one_Liberty_for_atari(int i, int j);
-	//int last_atari_heuristic( int color);
+	int last_atari_heuristic(int color);
 	//void try_to_save_by_eat(int neighbor_i,int neighbor_j,int* saves, int &saves_number);
 	//int find_one_Liberty_for_atari2(int bi, int bj, bool*checked);
 	int capture_heuristic(int color);
+	int save_heuristic(int color);
 	int capture_move(int bi, int bj, int color);
 	//int gains_liberty(int move, int color);
 	//int mogo_pattern_heuristic( int color);
@@ -111,12 +112,12 @@ public:
 	//bool match_cut2(int bi, int bj, int color);
 	//bool match_board_side(int bi, int bj, int color);
 
-	bool GoBoard::is_self_atari(int point, int color);
-	int GoBoard::gains_liberty(int move, String* s);
-	int GoBoard::add_point(int *points, int points_number, int point);
-	int GoBoard::add_string(String * strings[], int strings_number, String* string);
-	int GoBoard::total_liberties(int point, int color, int *liberties, int enough, String *exclude);
-	bool GoBoard::is_virtual_eye(int point, int color);
-	bool GoBoard::is_legal(int point, int color);
-	int GoBoard::strings_in_atari(int point, int color, String*strings[], int string_number);
+	bool is_self_atari(int point, int color);
+	int gains_liberty(int move, String* s);
+	int add_point(int *points, int points_number, int point);
+	int add_string(String * strings[], int strings_number, String* string);
+	int total_liberties(int point, int color, int *liberties, int enough, String *exclude);
+	bool is_virtual_eye(int point, int color);
+	bool is_legal(int point, int color);
+	int strings_in_atari(int point, int color, String*strings[], int string_number);
 };

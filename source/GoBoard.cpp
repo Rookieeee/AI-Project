@@ -1119,8 +1119,19 @@ int GoBoard::select_and_play(int color)
 	//	play_move(I(move), J(move), color);
 	//	return move;
 	//}
-
-	move = capture_heuristic( color);					//try to find a move that will capture the opponent
+	move = last_atari_heuristic(color);					//try to find a move that will capture the opponent
+	if (move != -1)
+	{
+		play_move(I(move), J(move), color);
+		return move;
+	}
+	move = save_heuristic(color);					//try to find a move that will capture the opponent
+	if (move != -1)
+	{
+		play_move(I(move), J(move), color);
+		return move;
+	}
+	move = capture_heuristic(color);					//try to find a move that will capture the opponent
 	if (move != -1 )
 	{
 		play_move(I(move), J(move), color);
