@@ -80,32 +80,7 @@ bool GoBoard::is_self_atari(int point, int color) //  is_self_atari that is , ad
 {
 	return total_liberties(point, color, 0, 1, 0) == 1;
 }
-//
-//
-//bool GoBoard::is_virtual_eye(int point, int color) 
-//{
-//  if (!is_surrounded(point, color)) return false;
-//  int nopponent = 0;
-//  int ai = I(point);
-//  int aj = J(point);
-//  bool at_edge = false;
-//  for (int i = 0; i < 4; i++) {
-//        int bi = ai + diag_i[i];
-//        int bj = aj + diag_j[i];
-//        if (!on_board(bi,bj))
-//        {
-//            at_edge = true;
-//            continue;
-//        }
-//        if( get_board(bi,bj) == OTHER_COLOR(color) ){
-//            nopponent++;
-//        }
-//  }
-//  if(at_edge)
-//    ++nopponent;
-//  return nopponent < 2;
-//}
-//
+
 bool GoBoard::heavy_policy(int point, int color)
 {
 	if (is_virtual_eye(point, color)) return false;

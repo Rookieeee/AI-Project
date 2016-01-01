@@ -1119,14 +1119,25 @@ int GoBoard::select_and_play(int color)
 	//	play_move(I(move), J(move), color);
 	//	return move;
 	//}
-	move = last_atari_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1)
-	{
-		play_move(I(move), J(move), color);
-		return move;
-	}
-	move = save_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1)
+
+
+
+
+	//move = last_atari_heuristic(color);					//try to find a move that will capture the opponent
+	//if (move != -1)
+	//{
+	//	play_move(I(move), J(move), color);
+	//	return move;
+	//}
+	//move = save_heuristic(color);					//try to find a move that will capture the opponent
+	//if (move != -1)
+	//{
+	//	play_move(I(move), J(move), color);
+	//	return move;
+	//}
+
+	move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
+	if (move != -1 && heavy_policy(move, color))
 	{
 		play_move(I(move), J(move), color);
 		return move;
@@ -1279,7 +1290,25 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 	return 0;
 }
 
+int GoBoard::random_choose_move(int * moves, int number_moves,int color)
+{
+	int pos = rand()*number_moves / (RAND_MAX + 1);
+	for (int i = pos; i < number_moves; ++i)
+	{
+		int move = moves[i];
+		if (available(I(move), J(move), color) && !is_virtual_eye(move, color))
+			return move;
+	}
+	for (int i = 0; i < pos; ++i)
+	{
+		int move = moves[i];
+		if (available(I(move), J(move), color) && !is_virtual_eye(move, color))
+			return move ;
+	}
+	return -1;
 
+
+}
 
 
 

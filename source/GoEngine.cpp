@@ -524,7 +524,7 @@ void GoEngine::aiMove(int *pos, int color, int *moves, int num_moves)
 {
 	//aiMovePreCheck(pos, color, moves, num_moves);
 	//if (*pos == -1)
-	aiMoveStart(pos, color);
+	//aiMoveStart(pos, color);
 	if (*pos == -1)
 		uctSearch(pos, color, moves, num_moves);
 }

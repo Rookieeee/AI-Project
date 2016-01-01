@@ -4,7 +4,7 @@
 #define WHITE 1
 #define BLACK 2
 
-#define THREAD_NUM 2
+#define THREAD_NUM 1
 
 #define MIN_BOARD 2
 #define MAX_BOARD 19
@@ -38,4 +38,4 @@
 #define CALCGAMESHIFT 75
 #define MAX_BEGINING 30
 
-#define MAXTIME 2.9*CLOCKS_PER_SEC
+#define MAXTIME 3*CLOCKS_PER_SEC

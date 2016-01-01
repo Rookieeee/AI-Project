@@ -94,12 +94,13 @@ public:
 	int save_heuristic(int color);
 	int capture_move(int bi, int bj, int color);
 	//int gains_liberty(int move, int color);
-	//int mogo_pattern_heuristic( int color);
-	//bool match_mogo_pattern(int bi, int bj, int color);
-	//bool match_hane(int bi, int bj, int color);
-	//bool match_cut1(int bi, int bj, int color);
-	//bool match_cut2(int bi, int bj, int color);
-	//bool match_board_side(int bi, int bj, int color);
+	int mogo_pattern_heuristic( int color);
+	bool match_mogo_pattern(int bi, int bj, int color);
+	int random_choose_move(int * moves, int number_moves,int color);
+	bool match_hane(int bi, int bj, int color);
+	bool match_cut1(int bi, int bj, int color);
+	bool match_cut2(int bi, int bj, int color);
+	bool match_board_side(int bi, int bj, int color);
 
 	bool is_self_atari(int point, int color);
 	int gains_liberty(int move, String* s);
