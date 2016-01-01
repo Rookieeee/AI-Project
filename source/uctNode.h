@@ -5,7 +5,7 @@
 #include "amaf.h"
 class uctNode{
 public:
-	int total_num_moves;
+	//int total_num_moves;
 	int play;
 	int playResult;
 	double amafPlay;

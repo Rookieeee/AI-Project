@@ -125,7 +125,7 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 
 	for (int i = 0; i < (int)curNode->nextMove.size(); ++i)
 	{
-		
+//		cerr << curNode->nextMove[i]->pos << " ";
 		if (curNode->nextMove[i]->play)
 		{
 			if (curNode->nextMove[i]->amafPlay)
@@ -145,7 +145,7 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 		}
 		else
 		{
-			cerr << curNode->nextMove[i]->pos << "!" <<endl;
+			//cerr << curNode->nextMove[i]->pos << "!" <<endl;
 
 			tmpScore = 1;
 		}
@@ -157,7 +157,9 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 
 		}
 	}
-
+	/*cerr << endl;*/
+	//if (best->lastMove)
+	//	cerr << best->pos << " " << best->lastMove->pos << " " << maxScore << endl;
 	return best;
 }
 //
@@ -219,6 +221,10 @@ uctNode* GoEngine::treePolicy(uctNode* v, int games, int* sim, AmafBoard *tamaf,
 			pass++;
 		else pass = 0;
 		go_board->play_move(I(move), J(move), curNode->color);
+		if (tamaf->side == 0 && curNode->color == BLACK)
+			cerr << "wrong side";
+		if (tamaf->side == 1 && curNode->color == WHITE)
+			cerr << "wrong side";
 		tamaf->play(move, ++(*sim));
 		
 		//cout << "here" << endl;
@@ -239,9 +245,7 @@ int GoEngine::defaultPolicy(GoBoard * temp, int color, bool* blackExist, bool* w
 
 void GoEngine::back_up_results(int result, std::vector<uctNode*> node_history, int nnodes, bool side, AmafBoard* tamaf)
 {
-	cerr << "nnodes:" << nnodes << endl;
 	for (int i = 0; i < nnodes; i++) {
-		cerr << node_history[i]->pos << " " << node_history[i]->color << "\n";
 		node_history[i]->set_results(1 - result);
 		node_history[i]->set_amaf(result, *tamaf, side, i + 1);
 		side = !side;
@@ -300,35 +304,31 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		std::vector<uctNode*> node_history;
 
 		int simulate_len = 0;
-		AmafBoard tamaf = AmafBoard(169);
+		AmafBoard tamaf = AmafBoard(170);
 		bool side;
 		if (temp_engine->move_color == BLACK)
 			side = 1;
 		else
 			side = 0;
-		tamaf.set_up(side, 169);
+		tamaf.set_up(side, 170);
 
 		//TODO
 		uctNode* chosenNode = temp_engine->treePolicy(root, temp_engine->games, &simulate_len, &tamaf, &node_history);//treePolicy's engine->games parameter no used?
 		//cout << "size of node_history:" << node_history.size();
-		
-		if(chosenNode->lastMove)
-			cerr << chosenNode->pos << " " << chosenNode->lastMove->pos << " "<< chosenNode->score << endl;
+
 		if (!chosenNode)
 		{
-			cerr << "No chosenNode\n";
+			cerr << "No chosenNode";
 			break;
 		}
-		else
-		{
-			cerr << "chosenNode" << chosenNode->pos << " "<<chosenNode->nextMove.size()<<" " << chosenNode->amafPlay << " " << chosenNode->amafPlayResult << " " << chosenNode->play << " " << chosenNode->playResult << " "<<chosenNode->score<<endl;
-			if (chosenNode->lastMove)
-				cerr << chosenNode->lastMove->pos<<endl;
-		}
-
-		if(temp_engine->go_board->get_board(I(chosenNode->pos), J(chosenNode->pos)) == EMPTY)
-			temp_engine->go_board->play_move(I(chosenNode->pos), J(chosenNode->pos), chosenNode->color);
-
+		//cerr << chosenNode->color << "*" << tamaf.side;
+		//if (temp_engine->go_board->on_board(I(chosenNode->pos), J(chosenNode->pos)) && temp_engine->go_board->get_board(I(chosenNode->pos), J(chosenNode->pos)) == EMPTY)
+		//{
+		//	cerr << chosenNode->pos;
+		//	temp_engine->go_board->play_move(I(chosenNode->pos), J(chosenNode->pos), chosenNode->color);
+		//	tamaf.play(chosenNode->pos, ++simulate_len);
+		//}
+		
 		bool* blackExist = new bool[GoBoard::board_size*GoBoard::board_size];
 		bool* whiteExist = new bool[GoBoard::board_size*GoBoard::board_size];
 		for (int ii = 0; ii < GoBoard::board_size*GoBoard::board_size; ++ii)
@@ -336,7 +336,10 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 			blackExist[ii] = 0;
 			whiteExist[ii] = 0;
 		}
-
+		if (chosenNode->color == BLACK && tamaf.side == 1)
+			cerr << "???";
+		if (chosenNode->color == WHITE && tamaf.side == 0)
+			cerr << "???";
 		reward = temp_engine->defaultPolicy(temp_engine->go_board, OTHER_COLOR(chosenNode->color), blackExist, whiteExist, &simulate_len, &tamaf);
 		//cout << simulate_len << "here" << endl;
 
@@ -392,16 +395,24 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		}
 
 		//temp_engine->backup(chosenNode, reward, blackExist, whiteExist, depth, &tamaf);
-		if (chosenNode->color == BLACK)
-			side = 1;
-		else
-			side = 0;
-		
+
+		if (chosenNode->color == root->color)
+			reward = 1 - reward;
+		uctNode* test = chosenNode;
+		int len = node_history.size();
+		while (test)
+		{
+			if (test != node_history[len - 1])
+				cerr << "his error";
+			test = test->lastMove;
+			--len;
+		}
 		temp_engine->back_up_results(reward, node_history, node_history.size(), side, &tamaf);
 
 		delete[]blackExist;
 		delete[]whiteExist;
 	}
+
 	printf("%d\n", temp_engine->games);
 	engine->roots[temp_p->thread_id] = root;
 	delete temp_engine;
@@ -430,7 +441,7 @@ void GoEngine::uctSearch(int *pos, int color, int *moves, int num_moves)
 	//if (roots[0]->nextMove.size()>0)		// exist nextmove
 	if (roots[0])
 	{
-		//roots[0]->show_node();
+		roots[0]->show_node();
 		//for (int i = 0; i < roots[0]->nextMove.size(); ++i)
 		//{
 		//	if (roots[0]->nextMove[i]->play >100)
@@ -469,6 +480,7 @@ void GoEngine::uctSearch(int *pos, int color, int *moves, int num_moves)
 			if (votes[i] > final_most_votes)
 			{
 				final_most_votes = votes[i];
+				
 				final_most_votes_move = i;
 				have_same_votes = 0;
 			}
@@ -503,7 +515,7 @@ void GoEngine::uctSearch(int *pos, int color, int *moves, int num_moves)
 	{
 		(*pos) = -1;
 	}
-
+	
 	delete []votes;
 	delete []visits;
 	for (int i = 0; i < THREAD_NUM; ++i)

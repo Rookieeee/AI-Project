@@ -685,7 +685,7 @@ bool GoBoard::available(int i, int j, int color)
 		int aj = j + deltaj[m];
 		if (!on_board(ai, aj))
 			continue;
-		if (board[POS(ai, aj)])
+		if (!board[POS(ai, aj)])
 			return 1;
 	}
 	if (!suicide(i, j, color))
@@ -726,6 +726,40 @@ bool GoBoard::available(int i, int j, int color)
 }
 
 
+bool GoBoard::is_true_eye(int point, int color)
+{
+	int i = 0, ncontrolled = 0;
+	if (!is_surrounded(point, color)) return false;
+	int ai = I(point);
+	int aj = J(point);
+	for (int m = 0; m < 4; ++m)
+	{
+		int bi = ai + diag_i[m];
+		int bj = aj + diag_j[m];
+		if (!on_board(bi, bj))
+			continue;
+		++i;
+		if (board[POS(bi, bj)])
+		{
+			if (board[POS(bi, bj)]->get_color() == color)
+				ncontrolled++;
+		}
+		else
+		{
+			if (is_surrounded(POS(bi, bj), color)) {
+				ncontrolled++;
+			}
+		}
+	}
+	if (i == 4)
+	{
+		if (ncontrolled > 2)
+			return true;
+	}
+	else if (ncontrolled == i)
+		return true;
+	return false;
+}
 
 void GoBoard::set_final_status_string(int pos, int status)
 {
@@ -872,46 +906,10 @@ void GoBoard::place_fixed_handicap(int handicap)
 
 ////Start here
 
-
-bool GoBoard::is_true_eye(int point, int color)
-{
-	int i = 0, ncontrolled = 0;
-	if (!is_surrounded(point, color)) return false;
-	int ai = I(point);
-	int aj = J(point);
-	for (int m = 0; m < 4; ++m)
-	{
-		int bi = ai + diag_i[m];
-		int bj = aj + diag_j[m];
-		if (!on_board(bi, bj))
-			continue;
-		++i;
-		if (board[POS(bi, bj)])
-		{
-			if (board[POS(bi, bj)]->get_color() == color)
-				ncontrolled++;
-		}
-		else
-		{
-			if (is_surrounded(POS(bi, bj), color)) {
-				ncontrolled++;
-			}
-		}
-	}
-	if (i == 4)
-	{
-		if (ncontrolled > 2)
-			return true;
-	}
-	else if (ncontrolled == i)
-		return true;
-	return false;
-}
 int GoBoard::generate_legal_moves(int* moves, int color)
 {
 	int num_moves = 0;
 	int ai, aj;
-	int k;
 
 	memset(moves, 0, sizeof(moves));
 	for (ai = 0; ai < board_size; ai++)
@@ -948,7 +946,6 @@ int GoBoard::generate_legal_moves(int* moves, int color)
 	}
 	return num_moves;
 }
-
 
 
 //int GoBoard::find_one_Liberty_for_atari2(int i, int j, bool*checked)
@@ -1056,12 +1053,12 @@ int GoBoard::random_legal_move(int color)
 	int pos = rand()*board_size2 / (RAND_MAX + 1);
 	for (int i = pos; i < board_size2; ++i)
 	{
-		if (available(I(i), J(i), color))
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color ) )
 			return i;
 	}
 	for (int i = 0; i < pos; ++i)
 	{
-		if (available(I(i), J(i), color))
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color))
 			return i;
 	}
 	return -1;
@@ -1152,7 +1149,7 @@ int GoBoard::select_and_play(int color)
 
 bool GoBoard::is_surrounded(int point, int color)
 {
-	if (!board[point])
+	if (board[point])
 		return false;
 	int ai = I(point);
 	int aj = J(point);
@@ -1195,7 +1192,7 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 	if (color != BLACK && color != WHITE) return -1;
 	int pass = 0;
 	int iterstep = step;
-	
+
 	if (color == BLACK)
 	{
 		while (pass < 2)
@@ -1205,19 +1202,33 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				blackExist[move] = 1;
+				if (tamaf->side == 0)
+					cerr << "wrong side1";
+
 				tamaf->play(move, ++(*simul_len));
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 			move = select_and_play(OTHER_COLOR(color));
 
 			if (move != -1)
 			{
 				whiteExist[move] = 1;
+				if (tamaf->side == 1)
+					cerr << "wrong side2";
 				tamaf->play(move, ++(*simul_len));
+
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 
 			if (iterstep > 3*board_size*board_size)
 				return -1;
@@ -1233,19 +1244,33 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			if (move != -1)
 			{
 				whiteExist[move] = 1;
+				if (tamaf->side == 1)
+					cerr << "wrong side3";
 				tamaf->play(move, ++(*simul_len));
+
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 			move = select_and_play(OTHER_COLOR(color));
 
 			if (move != -1)
 			{
 				blackExist[move] = 1;
+				if (tamaf->side == 0)
+					cerr << "wrong side4";
 				tamaf->play(move, ++(*simul_len));
+
 				pass = 0;
 			}
-			else pass++;
+			else
+			{
+				pass++;
+				tamaf->side = !tamaf->side;
+			}
 
 			if (iterstep > 3*board_size*board_size)
 				return -1;

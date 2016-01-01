@@ -48,7 +48,7 @@ public:
 	~GoBoard();
 
 	void play_move(int i, int j, int color);
-
+	bool is_true_eye(int point, int color);
 	int get_string(int i, int j, int *stonei, int *stonej);
 	void show_board();
 	static int pass_move(int i, int j);
