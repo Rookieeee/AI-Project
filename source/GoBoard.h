@@ -60,7 +60,7 @@ public:
 	GoBoard * copy_board();
 	int generate_legal_moves(int* moves, int color);
 	//int autoRun(int color, bool* blackExist, bool* whiteExist);
-	int autoRun_fill_the_board(int color, bool* blackExist, bool* whiteExist, int*simul_len, AmafBoard* tamaf);
+	int autoRun_fill_the_board(int color, int*simul_len, AmafBoard* tamaf);
 	//void calcGame(int *b, int *w, int *bScore, int *wScore);
 	void compute_final_status(void);
 	int get_final_status(int i, int j);

@@ -1094,8 +1094,8 @@ int GoBoard::select_and_play(int color)
 {
 	int move;
 
-	////int move = last_atari_heuristic(color);   //If the rival's last move is an atari, then try to find away to move out.(any point provide more liberty)
-	//if (move != -1 && heavy_policy(move, color))
+	//move = last_atari_heuristic(color);   //If the rival's last move is an atari, then try to find away to move out.(any point provide more liberty)
+	//if (move != -1)
 	//{
 	//	play_move(I(move), J(move), color);
 	//	return move;
@@ -1136,14 +1136,14 @@ int GoBoard::select_and_play(int color)
 	//	return move;
 	//}
 
-	move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
-	if (move != -1 && heavy_policy(move, color))
-	{
-		play_move(I(move), J(move), color);
-		return move;
-	}
+	//move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
+	//if (move != -1)
+	//{
+	//	play_move(I(move), J(move), color);
+	//	return move;
+	//}
 	move = capture_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1 )
+	if (move != -1)
 	{
 		play_move(I(move), J(move), color);
 		return move;
@@ -1199,7 +1199,7 @@ double GoBoard::chinese_count()
 	return eyes_result + black_score - white_score - komi;
 }
 
-int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist, int*simul_len, AmafBoard* tamaf)
+int GoBoard::autoRun_fill_the_board(int color, int*simul_len, AmafBoard* tamaf)
 {
 	if (color != BLACK && color != WHITE) return -1;
 	int pass = 0;
@@ -1213,7 +1213,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			int move = select_and_play(color);
 			if (move != -1)
 			{
-				blackExist[move] = 1;
 				tamaf->play(move, ++(*simul_len));
 				pass = 0;
 			}
@@ -1226,7 +1225,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 
 			if (move != -1)
 			{
-				whiteExist[move] = 1;
 				tamaf->play(move, ++(*simul_len));
 
 				pass = 0;
@@ -1250,7 +1248,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 			int move = select_and_play(color);
 			if (move != -1)
 			{
-				whiteExist[move] = 1;
 				tamaf->play(move, ++(*simul_len));
 
 				pass = 0;
@@ -1264,7 +1261,6 @@ int GoBoard::autoRun_fill_the_board(int color,bool* blackExist, bool* whiteExist
 
 			if (move != -1)
 			{
-				blackExist[move] = 1;
 				tamaf->play(move, ++(*simul_len));
 
 				pass = 0;
@@ -1296,14 +1292,18 @@ int GoBoard::random_choose_move(int * moves, int number_moves,int color)
 	for (int i = pos; i < number_moves; ++i)
 	{
 		int move = moves[i];
-		if (available(I(move), J(move), color) && !is_virtual_eye(move, color))
+		//if (available(I(move), J(move), color) && !is_virtual_eye(move, color))
+		//	return move;
+		if (heavy_policy(move, color))
 			return move;
 	}
 	for (int i = 0; i < pos; ++i)
 	{
 		int move = moves[i];
-		if (available(I(move), J(move), color) && !is_virtual_eye(move, color))
-			return move ;
+		//if (available(I(move), J(move), color) && !is_virtual_eye(move, color))
+		//	return move;
+		if (heavy_policy(move, color))
+			return move;
 	}
 	return -1;
 

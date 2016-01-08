@@ -206,7 +206,10 @@ int GoBoard::save_heuristic(int color)
 
 	if (save_moves_number)
 	{
-		return save_moves[rand()*save_moves_number / (RAND_MAX + 1)];
+		int move = random_choose_move(save_moves, save_moves_number, color);
+		if (move < 0)
+			return -1;
+		return move;
 	}
 	return -1;
 }
@@ -230,7 +233,11 @@ int GoBoard::last_atari_heuristic(int color)
 	}
 	if (last_atari_moves_number)
 	{
-		return last_atari_moves[rand()*last_atari_moves_number / (RAND_MAX + 1)];
+		//return last_atari_moves[rand()*last_atari_moves_number / (RAND_MAX + 1)];
+		int move = random_choose_move(last_atari_moves, last_atari_moves_number, color);
+		if (move < 0)
+			return -1;
+		return move;
 	}
 	return -1;
 }
