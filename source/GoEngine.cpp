@@ -326,6 +326,7 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		//	tamaf.play(chosenNode->pos, ++simulate_len);
 		//}
 		
+
 		//if (chosenNode->color == BLACK && tamaf.side == 1)
 		//	cerr << "???";
 		//if (chosenNode->color == WHITE && tamaf.side == 0)
@@ -375,7 +376,6 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		if (reward == -1)
 		{
 			cerr << "not finished";
-
 			continue;
 		}
 
@@ -393,6 +393,7 @@ DWORD WINAPI  GoEngine::ThreadFunc(LPVOID p)
 		//	--len;
 		//}
 		temp_engine->back_up_results(reward, node_history, node_history.size(), side, &tamaf);
+
 
 	}
 
@@ -424,7 +425,7 @@ void GoEngine::uctSearch(int *pos, int color, int *moves, int num_moves)
 	//if (roots[0]->nextMove.size()>0)		// exist nextmove
 	if (roots[0])
 	{
-		//roots[0]->show_node();
+		roots[0]->show_node();
 		//for (int i = 0; i < roots[0]->nextMove.size(); ++i)
 		//{
 		//	if (roots[0]->nextMove[i]->play >100)
