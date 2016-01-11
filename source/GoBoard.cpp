@@ -320,21 +320,7 @@ GoBoard * GoBoard::copy_board()
 	return temp;
 }
 
-//int GoBoard::suicideLike(int i, int j, int color)
-//{
-//	int k;
-//	int ans = 0;
-//	for (k = 0; k < 4; ++k)
-//	{
-//		int ai = i + deltai[k];
-//		int aj = j + deltaj[k];
-//		if (on_board(ai, aj) && get_board(ai, aj) == EMPTY)
-//			++ans;
-//		else if (on_board(ai, aj) && get_board(ai, aj) == color)
-//			ans += checkLiberty(ai, aj) - 1;
-//	}
-//	return ans == 1;
-//}
+
 
 
 int GoBoard::findALiberty(int i, int j)
@@ -650,40 +636,7 @@ int GoBoard::total_liberties(int point, int color, int *liberties, int enough, S
 	return libs_number;
 
 }
-//bool GoBoard::available(int i, int j, int color)
-//
-//{
-//	//return (on_board(i,j)==1) && (legal_move(i,j,color)==1) && (suicide(i,j,color)==0);
-//
-//	if (!on_board(i, j) || get_board(i, j) != EMPTY)
-//	{
-//		return false;
-//	}
-//	if (legal_move(i, j, color) && !suicide(i, j, color))
-//	{
-//		if (!suicide(i, j, OTHER_COLOR(color)))
-//		{
-//			return true;
-//		}
-//		else
-//		{
-//			for (int k = 0; k<4; ++k)
-//			{
-//				int bi = i + deltai[k];
-//				int bj = j + deltaj[k];
-//				if (on_board(bi, bj) && get_board(bi, bj) == OTHER_COLOR(color))
-//				{
-//					return true;
-//				}
-//				if (on_board(bi, bj) && get_board(bi, bj) && get_board(bi, bj) == color && checkLiberty(bi, bj) == 1)
-//				{
-//					return true;
-//				}
-//			}
-//		}
-//	}
-//	return false;
-//}
+
 bool GoBoard::available(int i, int j, int color)
 {
 	/* Consider moving at (ai, aj) if it is legal and not suicide. */
@@ -711,28 +664,7 @@ bool GoBoard::available(int i, int j, int color)
 	}
 	return 0;
 
-	//if (legal_move(i, j, color) && !suicide(i, j, color))
-	//{
-	//	/* Further require the move not to be suicide for the opponent... */
-	//	if (!suicide(i, j, OTHER_COLOR(color)))
-	//		return 1;
-	//	else
-	//	{
-	//		/* ...however, if the move captures at least one stone,
-	//		* consider it anyway.
-	//		*/
-	//		for (int k = 0; k < 4; k++)
-	//		{
-	//			int bi = i + deltai[k];
-	//			int bj = j +deltaj[k];
-	//			if (on_board(bi, bj) && get_board(bi, bj) == OTHER_COLOR(color))
-	//			{
-	//				return 1;
-	//			}
-	//		}
-	//	}
-	//}
-	//return 0;
+
 }
 
 
@@ -928,131 +860,13 @@ int GoBoard::generate_legal_moves(int* moves, int color)
 		{
 			if (available(ai, aj, color) && !is_true_eye(POS(ai, aj), color))
 				moves[num_moves++] = POS(ai, aj);
-			///* Consider moving at (ai, aj) if it is legal and not suicide. */
-			//if (legal_move(ai, aj, color) && !suicide(ai, aj, color))
-			//{
-			//	/* Further require the move not to be suicide for the opponent... */
-			//	if (!suicide(ai, aj, OTHER_COLOR(color)))
-			//		moves[num_moves++] = POS(ai, aj);
-			//	else
-			//	{
-			//		/* ...however, if the move captures at least one stone,
-			//		* consider it anyway.
-			//		*/
-			//		for (k = 0; k < 4; k++)
-			//		{
-			//			int bi = ai + deltai[k];
-			//			int bj = aj + deltaj[k];
-			//			if (on_board(bi, bj) && get_board(bi, bj) == OTHER_COLOR(color))
-			//			{
-			//				moves[num_moves++] = POS(ai, aj);
-			//				break;
-			//			}
 
-			//		}
-			//	}
-			//}
 		}
 	}
 	return num_moves;
 }
 
 
-//int GoBoard::find_one_Liberty_for_atari2(int i, int j, bool*checked)
-//{
-//	int color = get_board(i, j);
-//	if (color == EMPTY)
-//		return -1;
-//	int ai;
-//	int aj;
-//	int pos = POS(i, j);
-//	int pos1 = pos;
-//	int liberty_point = -1;
-//	int ans = 0;
-//	do {
-//		if (checked[pos1])
-//			return -1;
-//		checked[pos1] = true;
-//		if (ans > 1) return -1;
-//		ai = I(pos1);
-//		aj = J(pos1);
-//		for (int k = 0; k < 4; ++k)
-//		{
-//			int bi = ai + deltai[k];
-//			int bj = aj + deltaj[k];
-//			if (on_board(bi, bj) && get_board(bi, bj) == EMPTY)
-//			{
-//				++ans;
-//				liberty_point = POS(bi, bj);
-//			}
-//		}
-//		pos1 = next_stone[pos1];
-//	} while (pos1 != pos);
-//	if (ans == 1)
-//		return liberty_point;
-//	return -1;
-//}
-//int GoBoard::find_one_Liberty_for_atari(int i, int j)
-//{
-//	if (!on_board(i, j))
-//		return -1;
-//	int color = get_board(i, j);
-//	if (color == EMPTY)
-//		return -1;
-//	int ai;
-//	int aj;
-//	int pos = POS(i, j);
-//	int pos1 = pos;
-//	int liberty_point = -1;
-//	int ans = 0;
-//	do {
-//		if (ans > 1) return -1;
-//		ai = I(pos1);
-//		aj = J(pos1);
-//		for (int k = 0; k < 4; ++k)
-//		{
-//			int bi = ai + deltai[k];
-//			int bj = aj + deltaj[k];
-//			if (on_board(bi, bj) && get_board(bi, bj) == EMPTY)
-//			{
-//				++ans;
-//				liberty_point = POS(bi, bj);
-//			}
-//		}
-//		pos1 = next_stone[pos1];
-//	} while (pos1 != pos);
-//	if (ans == 1)
-//		return liberty_point;
-//	return -1;
-//}
-
-//int GoBoard::check_one_Liberty(int i, int j)
-//{
-//	if (!on_board(i, j))
-//		return -1;
-//	int color = get_board(i, j);
-//	if (color == EMPTY)
-//		return -1;
-//	int ai;
-//	int aj;
-//	int pos = POS(i, j);
-//	int pos1 = pos;
-//	int ans = 0;
-//	do {
-//		if (ans > 1) return 2;
-//		ai = I(pos1);
-//		aj = J(pos1);
-//		for (int k = 0; k < 4; ++k)
-//		{
-//			int bi = ai + deltai[k];
-//			int bj = aj + deltaj[k];
-//			if (on_board(bi, bj) && get_board(bi, bj) == EMPTY)
-//				++ans;
-//		}
-//		pos1 = next_stone[pos1];
-//	} while (pos1 != pos);
-//	return ans;
-//}
 
 
 
@@ -1063,51 +877,16 @@ int GoBoard::random_legal_move(int color)
 	int pos = rand()*board_size2 / (RAND_MAX + 1);
 	for (int i = pos; i < board_size2; ++i)
 	{
-		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color ) &&!is_self_atari(i,color) )
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color ) ) //&& !is_self_atari(i, color)
 			return i;
 	}
 	for (int i = 0; i < pos; ++i)
 	{
-		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color)&&!is_self_atari(i,color)   )
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color)) // && !is_self_atari(i, color)
 			return i;
 	}
 	return -1;
-	//for (int i = 0; i < 95; ++i)
-	//{
-	//	int pos = rand()*board_size*board_size / (RAND_MAX + 1);
-	//	if (available(I(pos), J(pos), color))
-	//		return pos;
-	//}
-	////unsigned long long middle = GetCycleCount() ;
-	////unsigned long long middle2 = GetCycleCount();
-	//
-	////nsigned long long middle3 = GetCycleCount();
-	//int  reasonable_moves[169];
-	//
-	//int num = 0;
-	//for (int i = 0; i < board_size*board_size; ++i)
-	//{
-	//	if (available(I(i), J(i), color))
-	//		reasonable_moves[num++] = i;
 
-	//}
-
-	////unsigned long long middle4 = GetCycleCount();
-	////printf("%llu\n%llu\n%llu\n%llu\n%llu\n", start,middle, middle2, middle3, middle4);
-
-
-	////int num = generate_legal_moves(reasonable_moves, color);
-
-	//if (num == 0)
-	//{
-	//	//delete reasonable_moves;
-	//	return -1;
-	//}
-	//int move = reasonable_moves[rand()*num / (RAND_MAX + 1)];
-	////delete reasonable_moves;
-
-
-	//return move;
 }
 
 int GoBoard::select_and_play(int color)
@@ -1129,12 +908,12 @@ int GoBoard::select_and_play(int color)
 		return move;
 	}
 
-	//move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
-	//if (move != -1)
-	//{
-	//	play_move(I(move), J(move), color);
-	//	return move;
-	//}
+	move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
+	if (move != -1)
+	{
+		play_move(I(move), J(move), color);
+		return move;
+	}
 	move = capture_heuristic(color);					//try to find a move that will capture the opponent
 	if (move != -1 )
 	{
@@ -1300,26 +1079,3 @@ int GoBoard::random_choose_move(int * moves, int number_moves,int color)
 }
 
 
-
-/* Compute final status. This function is only valid to call in a
-* position where generate_move() would return pass for at least one
-* color.
-*
-* Due to the nature of the move generation algorithm, the final
-* status of stones can be determined by a very simple algorithm:
-*
-* 1. Stones with two or more liberties are alive with territory.
-* 2. Stones in atari are dead.
-*
-* Moreover alive stones are unconditionally alive even if the
-* opponent is allowed an arbitrary number of consecutive moves.
-* Similarly dead stones cannot be brought alive even by an arbitrary
-* number of consecutive moves.
-*
-* Seki is not an option. The move generation algorithm would never
-* leave a seki on the board.
-*
-* Comment: This algorithm doesn't work properly if the game ends with
-*          an unfilled ko. If three passes are required for game end,
-*          that will not happen.
-*/

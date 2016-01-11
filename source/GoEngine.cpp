@@ -32,28 +32,6 @@ GoEngine * GoEngine::copy_engine(GoBoard *b)
 	return temp_engine;
 }
 
-//uctNode* GoEngine::expand(uctNode* curNode, int* moves, int num_moves)
-//{
-//	for (int i = 0; i < num_moves; ++i)
-//	{
-//		bool flag = true;
-//		for (int j = 0; j< (int)curNode->nextMove.size(); ++j)
-//		{
-//			if (moves[i] == curNode->nextMove[j]->pos)
-//			{
-//				flag = false;
-//				break;
-//			}
-//		}
-//		if (flag)//TODO
-//		{
-//			uctNode* nextchosenNode = new uctNode(moves[i], OTHER_COLOR(curNode->color), curNode);
-//			curNode->addPos(nextchosenNode);
-//			return nextchosenNode;
-//		}
-//	}
-//	return NULL; //indicates error
-//}
 
 
 void GoEngine::calScore(uctNode* tmp)
@@ -78,35 +56,6 @@ void GoEngine::calScore(uctNode* tmp)
 
 }
 
-
-
-//uctNode* GoEngine::bestchild(uctNode* curNode)
-//{
-//	if (curNode->nextMove.size() == 0)
-//		return NULL;
-//	calScore(curNode);
-//	double V = 5000;
-//	double alpha = V - curNode->nextMove[0]->play > 0 ? (V - curNode->nextMove[0]->play) / (V) : 0;
-//	//alpha = curNode->nextMove[0]->amafPlay *1.0 / (curNode->nextMove[0]->play + curNode->nextMove[0]->amafPlay);
-//	//alpha = 0.3;
-//	double tmpScore;
-//	double maxScore = alpha * curNode->nextMove[0]->amafScore + (1 - alpha)*curNode->nextMove[0]->score;
-//	uctNode* best = curNode->nextMove[0];
-//
-//	for (int i = 1; i < (int )curNode->nextMove.size(); ++i)
-//	{
-//		alpha = V - curNode->nextMove[i]->play > 0 ? (V - curNode->nextMove[i]->play) / (V) : 0;
-//		//alpha = curNode->nextMove[i]->amafPlay * 1.0 / (curNode->nextMove[i]->play + curNode->nextMove[i]->amafPlay);
-//		tmpScore = alpha * curNode->nextMove[i]->amafScore + (1 - alpha)*curNode->nextMove[i]->score;
-//		if (tmpScore > maxScore)
-//		{
-//			maxScore = tmpScore;
-//			best = curNode->nextMove[i];
-//		}
-//	}
-//
-//	return best;
-//}
 
 uctNode* GoEngine::bestchild(uctNode* curNode)
 {
@@ -159,37 +108,7 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 
 	return best;
 }
-//
-//uctNode* GoEngine::treePolicy(uctNode* v, int games, AmafBoard *tamaf)
-//{
-//	uctNode* curNode = v;
-//	int* moves = new int[MAX_BOARD * MAX_BOARD]; //available moves
-//	int num_moves;	//available moves_count
-//	while (curNode)
-//	{
-//		if (curNode->pos != last_point)
-//		{
-//			go_board->play_move(I(curNode->pos), J(curNode->pos), curNode->color);
-//		}
-//		
-//		//if(curNode->total_num_moves = -1)
-//		//	curNode->total_num_moves = go_board->generate_legal_moves(moves, OTHER_COLOR(curNode->color));
-//		num_moves = go_board->generate_legal_moves(moves, OTHER_COLOR(curNode->color));
-//
-//		if (num_moves != curNode->nextMove.size()) //not fully expanded
-//		{
-//			uctNode* tmp = expand(curNode, moves, num_moves);
-//			delete[]moves;
-//			return tmp;
-//		}
-//		else
-//		{
-//			curNode = bestchild(curNode);
-//		}
-//	}
-//	delete[]moves;
-//	return curNode;
-//}
+
 uctNode* GoEngine::expand(uctNode* curNode, int* moves, int num_moves)
 {
 

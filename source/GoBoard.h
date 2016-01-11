@@ -98,6 +98,7 @@ public:
 	int mogo_pattern_heuristic( int color);
 	bool match_mogo_pattern(int bi, int bj, int color);
 	int random_choose_move(int * moves, int number_moves,int color);
+	bool match_mid(int i, int j, int my_color);
 	bool match_hane(int bi, int bj, int color);
 	bool match_cut1(int bi, int bj, int color);
 	bool match_cut2(int bi, int bj, int color);
