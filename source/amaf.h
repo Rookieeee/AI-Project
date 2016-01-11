@@ -1,12 +1,11 @@
 #ifndef AMAFH
 #define AMAFH
-#include "size.h"
 #include <iostream>
 #include <iomanip>
-
+#include "constants.h"
 class AmafBoard {
 private:
-	int board[MAXSIZE2 + 1];
+	int board[MAX_BOARD2 + 1];
 	int size;
 	
 
@@ -14,7 +13,7 @@ public:
 	bool side;
 	AmafBoard(int sz)
 	{
-		size = sz <= MAXSIZE ? sz : MAXSIZE;
+		size = sz <= MAX_BOARD ? sz : MAX_BOARD;
 		side = 0;
 		clear();
 	}
