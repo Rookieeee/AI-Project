@@ -188,7 +188,7 @@ int GoBoard::last_atari_heuristic(int color)
 
 	if (last_atari_point>=0 &&  board[last_atari_point] &&board[last_atari_point]->get_color() == color && board[last_atari_point]->get_liberties_number() == 1  )
 	{
-		int points[MAXSIZE2];
+		int points[MAX_BOARD2];
 
 		int number_points = find_escape_point(board[last_atari_point], points,0);
 		int move = random_choose_move(points, number_points, color);
