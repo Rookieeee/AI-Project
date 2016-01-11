@@ -7,7 +7,7 @@ class AmafBoard {
 private:
 	int board[MAX_BOARD2 + 1];
 	int size;
-	
+
 
 public:
 	bool side;
