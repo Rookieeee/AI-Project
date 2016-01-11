@@ -533,7 +533,7 @@ int GoBoard::gains_liberty(int move, String* s)
 {
 	int cur_liberties = 1;
 	if (s) cur_liberties = s->get_liberties_number ();
-	int nlibs = total_liberties(move, s->get_color(), 0, cur_liberties, s);
+	int nlibs = total_liberties2(move, s->get_color(), 0, cur_liberties, s);
 	return nlibs > cur_liberties;
 }
 int GoBoard::add_point(int *points, int points_number, int point)
@@ -559,6 +559,107 @@ int GoBoard::add_string(String * strings[], int strings_number, String* string)
 	strings[strings_number] = string;
 	return 1;
 }
+int GoBoard::total_liberties2(int point, int color, int *liberties, int enough, String *exclude)
+{
+	int libs[MAX_BOARD2];
+	int libs_number = 0;
+	bool belong_to_liberty = false;
+	for (int i = 0; i < exclude->get_liberties_number(); ++i)
+	{
+		if (exclude->liberties[i] != point)
+			libs[libs_number++] = exclude->liberties[i];
+		else
+			belong_to_liberty = true;
+	}
+	String *strings[4];
+	int string_number = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		int ai = I(point) + deltai[i];
+		int aj = J(point) + deltaj[i];
+		if (!on_board(ai, aj))
+			continue;
+		if (!board[POS(ai, aj)])
+		{
+			if (belong_to_liberty)
+				libs[libs_number++] = POS(ai, aj);
+		}
+		else
+			string_number += add_string(strings, string_number, board[POS(ai, aj)]);
+	}
+	if (enough &&libs_number > enough) return libs_number;
+	for (int i = 0; i < string_number; ++i)
+	{
+		String *cur_string = strings[i];
+		if (cur_string != exclude)
+		{
+			if (cur_string->get_color() == color )
+			{
+				if (!belong_to_liberty)
+					continue;
+				for (int j = 0; j < cur_string->get_liberties_number(); ++j)
+				{
+					if (cur_string->liberties[j] != point)
+					{
+						libs_number += add_point(libs, libs_number, cur_string->liberties[j]);
+						if (enough && libs_number > enough) return libs_number;
+					}
+				}
+			}
+			else if (cur_string->get_liberties_number() == 1)
+			{
+				for (int j = 0; j < cur_string->get_stones_number(); ++j)
+				{
+					int bi = I(cur_string->stones[j]);
+					int bj = J(cur_string->stones[j]);
+					for (int k = 0; k < 4; ++k)
+					{
+						int ci = bi + deltai[k];
+						int cj = bj + deltaj[k];
+						if (!on_board(ci, cj))
+							continue;
+						if (POS(ci, cj) == point)
+						{
+							if (belong_to_liberty)
+							{
+								libs_number += add_point(libs, libs_number, cur_string->stones[j]);
+								if (enough &&libs_number > enough) return libs_number;
+							}
+						}
+						else
+							if (board[POS(ci, cj)] && board[POS(ci, cj)]->get_color() == color)
+							{
+								for (int m = 0; m < string_number; ++m)
+								{
+									if (board[POS(ci, cj)] == strings[m] )
+									{
+										if (belong_to_liberty)
+										{
+											libs_number += add_point(libs, libs_number, POS(bi, bj));
+											if (enough&&libs_number > enough) return libs_number;
+										}
+										else
+										{
+											if (board[POS(ci, cj)] == exclude)
+											{
+												libs_number += add_point(libs, libs_number, POS(bi, bj));
+												if (enough&&libs_number > enough) return libs_number;
+											}
+										}
+									}
+
+								}
+							}
+
+
+					}
+				}
+			}
+		}
+	}
+	return libs_number;
+}
+
 int GoBoard::total_liberties(int point, int color, int *liberties, int enough, String *exclude)
 {
 
@@ -618,7 +719,7 @@ int GoBoard::total_liberties(int point, int color, int *liberties, int enough, S
 								{
 									for (int m = 0; m < string_number; ++m)
 									{
-										if (board[POS(ci, cj)] == strings[m])
+										if (board[POS(ci, cj)] == strings[m] )
 										{
 											libs_number += add_point(libs, libs_number, POS(bi, bj));
 											if (enough&&libs_number > enough) return libs_number;
@@ -901,6 +1002,7 @@ int GoBoard::select_and_play(int color)
 		play_move(I(move), J(move), color);
 		return move;
 	}
+
 	move = save_heuristic(color);					//try to find a move that will capture the opponent
 	if (move != -1)
 	{
@@ -915,7 +1017,7 @@ int GoBoard::select_and_play(int color)
 		return move;
 	}
 	move = capture_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1 )
+	if (move != -1)
 	{
 		play_move(I(move), J(move), color);
 		return move;

@@ -103,7 +103,7 @@ public:
 	bool match_cut1(int bi, int bj, int color);
 	bool match_cut2(int bi, int bj, int color);
 	bool match_board_side(int bi, int bj, int color);
-
+	int total_liberties2(int point, int color, int *liberties, int enough, String *exclude);
 	bool is_self_atari(int point, int color);
 	int gains_liberty(int move, String* s);
 	int add_point(int *points, int points_number, int point);

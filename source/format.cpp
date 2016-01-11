@@ -78,6 +78,16 @@
 //
 bool GoBoard::is_self_atari(int point, int color) //  is_self_atari that is , add this point, the group of the move will be in atari(only one liberty)
 {
+	for (int i = 0; i < 4; ++i)
+	{
+		int ai = I(point) + deltai[i];
+		int aj = J(point) + deltaj[i];
+		if (!on_board(ai, aj))
+			continue;
+		if (board[POS(ai, aj)] && board[POS(ai, aj)]->get_color() == OTHER_COLOR(color) && board[POS(ai, aj)]->get_liberties_number() == 1)
+			return false;
+	}
+
 	return total_liberties(point, color, 0, 1, 0) == 1;
 }
 
