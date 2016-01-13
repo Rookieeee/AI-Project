@@ -95,7 +95,41 @@ int GoBoard::neighbour_strings(int point, int color, int max_liberties, String *
 	return index;
 }
 
+int GoBoard::nakade_heuristic(int color)
+{
+	if (last_point < 0)
+		return -1;
+	int nakade_moves[MAX_BOARD2];
+	int nakade_moves_number = 0;
+	for (int i = 0; i < 8; ++i)
+	{
+		int bi = I(last_point) + around_i[i];
+		int bj = J(last_point) + around_j[i];
+		int move = POS(bi, bj);
+		if (on_board(bi, bj) && get_board(bi, bj) == EMPTY && (create_eyes(move, color) > 1 || create_eyes(move, OTHER_COLOR(color)) > 1))
+		{
+			//std::cerr << "?";
+			nakade_moves[nakade_moves_number++] = move;
+		}
+	}
+	int move = random_choose_move(nakade_moves, nakade_moves_number, color);
+	if (move >= 0)
+		return move;
+	return -1;
+}
+int GoBoard::create_eyes(int point, bool color)
+{
+	int neyes = 0;
+	for (int i = 0; i<4; i++) 
+	{
+		int bi = I(point) + deltai[i];
+		int bj = J(point) + deltaj[i];
+		if (on_board(bi, bj) && get_board(bi, bj) == EMPTY && is_true_eye(POS(bi, bj), color, point))
+			neyes++;
+	}
 
+	return neyes;
+}
 
 int GoBoard::save_heuristic(int color)
 {
@@ -174,7 +208,7 @@ int GoBoard::last_atari_heuristic(int color)
 	if (last_atari_point>=0&& board[last_atari_point] && board[last_atari_point]->get_color() == OTHER_COLOR(color) && board[last_atari_point]->get_liberties_number() == 1)
 	{
 		int move = board[last_atari_point]->liberties[0];
-		if (available(I(move), J(move), color) && !is_self_atari(move, color) && gains_liberty(move, board[last_atari_point])) //
+		if (available(I(move), J(move), color) && !is_self_atari(move, color)) //
 		{
 			return move;
 		}

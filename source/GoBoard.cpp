@@ -533,7 +533,8 @@ int GoBoard::gains_liberty(int move, String* s)
 {
 	int cur_liberties = 1;
 	if (s) cur_liberties = s->get_liberties_number ();
-	int nlibs = total_liberties2(move, s->get_color(), 0, cur_liberties, s);
+	int nlibs = total_liberties(move, s->get_color(), 0, cur_liberties, s);
+	//int nlibs = total_liberties2(move, s->get_color(), 0, cur_liberties, s);
 	return nlibs > cur_liberties;
 }
 int GoBoard::add_point(int *points, int points_number, int point)
@@ -769,10 +770,10 @@ bool GoBoard::available(int i, int j, int color)
 }
 
 
-bool GoBoard::is_true_eye(int point, int color)
+bool GoBoard::is_true_eye(int point, int color, int cur)
 {
 	int i = 0, ncontrolled = 0;
-	if (!is_surrounded(point, color)) return false;
+	if (!is_surrounded(point, color, cur)) return false;
 	int ai = I(point);
 	int aj = J(point);
 	for (int m = 0; m < 4; ++m)
@@ -789,7 +790,7 @@ bool GoBoard::is_true_eye(int point, int color)
 		}
 		else
 		{
-			if (is_surrounded(POS(bi, bj), color)) {
+			if (is_surrounded(POS(bi, bj), color, cur)) {
 				ncontrolled++;
 			}
 		}
@@ -993,16 +994,18 @@ int GoBoard::random_legal_move(int color)
 int GoBoard::select_and_play(int color)
 {
 	int move;
-
-
-
 	move = last_atari_heuristic(color);					//try to find a move that will capture the opponent
 	if (move != -1)
 	{
 		play_move(I(move), J(move), color);
 		return move;
 	}
-
+	move = capture_heuristic(color);					//try to find a move that will capture the opponent
+	if (move != -1)
+	{
+		play_move(I(move), J(move), color);
+		return move;
+	}
 	move = save_heuristic(color);					//try to find a move that will capture the opponent
 	if (move != -1)
 	{
@@ -1016,9 +1019,8 @@ int GoBoard::select_and_play(int color)
 		play_move(I(move), J(move), color);
 		return move;
 	}
-	move = capture_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1)
-	{
+	move = nakade_heuristic(color);
+	if (move != -1) {
 		play_move(I(move), J(move), color);
 		return move;
 	}
@@ -1033,7 +1035,7 @@ int GoBoard::select_and_play(int color)
 }
 
 
-bool GoBoard::is_surrounded(int point, int color)
+bool GoBoard::is_surrounded(int point, int color, int cur)
 {
 	if (board[point])
 		return false;
@@ -1042,7 +1044,7 @@ bool GoBoard::is_surrounded(int point, int color)
 	for (int k = 0; k < 4; ++k) {
 		int bi = ai + deltai[k];
 		int bj = aj + deltaj[k];
-		if (!on_board(bi, bj))
+		if (!on_board(bi, bj) || POS(bi, bj) == cur)
 			continue;
 		if (get_board(bi,bj) != color)
 			return false;

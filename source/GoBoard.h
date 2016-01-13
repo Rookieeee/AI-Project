@@ -36,7 +36,7 @@ public:
 	~GoBoard();
 
 	void play_move(int i, int j, int color);
-	bool is_true_eye(int point, int color);
+	bool is_true_eye(int point, int color, int cur = -2);
 	int get_string(int i, int j, int *stonei, int *stonej);
 	void show_board();
 	static int pass_move(int i, int j);
@@ -74,7 +74,7 @@ public:
 	int select_and_play(int color);
 	int random_legal_move(int color);
 	double chinese_count();
-	bool is_surrounded(int point, int color);
+	bool is_surrounded(int point, int color, int cur = -2);
 
 	////int is_heuristic_available(int color, int last_point);
 	int is_star_available(int color, int last_point);
@@ -94,6 +94,8 @@ public:
 	int capture_heuristic(int color);
 	int save_heuristic(int color);
 	int capture_move(int bi, int bj, int color);
+	int nakade_heuristic(int color);
+	int create_eyes(int point, bool color);
 	//int gains_liberty(int move, int color);
 	int mogo_pattern_heuristic( int color);
 	bool match_mogo_pattern(int bi, int bj, int color);

@@ -65,7 +65,7 @@ uctNode* GoEngine::bestchild(uctNode* curNode)
 	//	return NULL;
 	//}
 	calScore(curNode);
-	const double BIAS = 1.0 / 3000000, UCTK = 0.0;
+	const double BIAS = 1.0 / 3000000;
 
 
 	double tmpScore;
