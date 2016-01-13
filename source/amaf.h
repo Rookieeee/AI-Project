@@ -7,13 +7,13 @@ class AmafBoard {
 private:
 	int board[MAX_BOARD2 + 1];
 	int size;
-
+	
 
 public:
 	bool side;
 	AmafBoard(int sz)
 	{
-		size = sz <= MAX_BOARD ? sz : MAX_BOARD;
+		size = sz <= MAX_BOARD2 ? sz : MAX_BOARD2;
 		side = 0;
 		clear();
 	}

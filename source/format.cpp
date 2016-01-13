@@ -1,81 +1,6 @@
 #include "GoBoard.h"
 #include <queue>
-///*bool Goban::fast_ladder(int point, bool color) const
-//{
-//  if (total_liberties(point, color, 0) != 2) return false;
-//  if (neighbour_groups(point, !color, 2, 0)) return false;
-//  PointList<5> liberties;
-//  point_liberties(point, liberties);
-//  for (int i = 0; i < liberties.length(); i++) {
-//    PointList<5> secondary_libs;
-//    int delta[2] = {0};
-//    if (point_liberties(liberties[i], secondary_libs) == 4) continue;
-//
-//    delta[0] = liberties[i] - point;
-//    for (int j = 0; j < secondary_libs.length(); j++) {
-//      if (secondary_libs[j] != point && secondary_libs[j] != liberties[i] + delta[0]) {
-//        delta[1] = secondary_libs[j] - liberties[i];
-//        break;
-//      }
-//    }
-//    if (delta[1] == 0) return true;
-//    int p = point, act = 0;
-//    while (distance_to_edge[p] > 1) {
-//      p = p + delta[act];
-//
-//      if (points[p]) {
-//        if (points[p]->get_color() == color) break;
-//        else return true;
-//      }
-//      if (points[p + delta[act]]) {
-//        if (points[p + delta[act]]->get_color() == color) break;
-//        else return true;
-//      }
-//      act = 1-act;
-//    }
-//    if (distance_to_edge[p] < 2) return true;
-//  }
-//  return false;
-//}*/
-//
-//
-///*int Goban::atari_last_liberty(int point, bool color) const
-//{
-//  PointSet<MAXSIZE2> liberties;
-//  if (total_liberties(point, color, &liberties, 1) == 1) return liberties[0]; //Maybe 0!
-//  return -1;
-//}
-//
-//bool GoBoard::bad_self_atari(int point, bool color) const
-//{
-//  int last_lib = atari_last_liberty(point, color);
-//  if (last_lib == -1) return false;
-//#ifdef DEBUG_INFO
-//  std::cerr << "self_atari at " << point << "\n";
-//#endif
-//    if (total_liberties(last_lib, !color, 0) < 2) {
-//#ifdef DEBUG_INFO
-//      std::cerr << "snapback\n";
-//#endif  
-//      return false;
-//    }
-//    if (creates_eyes(point, !color) && !creates_eyes(last_lib, !color)) {
-//#ifdef DEBUG_INFO
-//        std::cerr << "throw-in\n";
-//#endif
-//      return false;
-//    }
-//
-//  if (nakade_shape(point, color)) {
-//#ifdef DEBUG_INFO
-//    std::cerr << "nakade\n";
-//#endif
-//    return false;
-//  }
-//  return true;
-//}
-//*/
-//
+
 bool GoBoard::is_self_atari(int point, int color) //  is_self_atari that is , add this point, the group of the move will be in atari(only one liberty)
 {
 	for (int i = 0; i < 4; ++i)
@@ -100,22 +25,7 @@ bool GoBoard::heavy_policy(int point, int color)
 	//if (bad_self_atari(point,color)) return false; do not understand.... refer the source code.
 	return true;
 }
-//
-////int GoBoard::is_heuristic_available(int color, int last_point)
-////{
-////	int other = OTHER_COLOR(color);
-////	int move = last_atari_heuristic(color);
-////	if (move != -1)
-////	{
-////		return move;
-////	}
-////
-////	if (last_point != -1)
-////	{
-////
-////	}
-////}
-//
+
 int GoBoard::is_kakari_available(int color, int last_point)
 {
 	int star[4] = { 3 * board_size + 3, 3 * board_size + 9, 9 * board_size + 3, 9 * board_size + 9 }; //stars position

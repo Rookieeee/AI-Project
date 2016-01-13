@@ -4,7 +4,7 @@
 #define WHITE 1
 #define BLACK 2
 
-#define THREAD_NUM 1
+#define THREAD_NUM 4
 
 #define MIN_BOARD 2
 #define MAX_BOARD 19
@@ -27,7 +27,7 @@
 #define MAXGAMES 22500
 #define MONTECARLORANGE 13
 #define CLEARTIME 10
-#define VERSION_STRING "3.5"
+#define VERSION_STRING "3.6"
 #define UNKNOWN 5
 #define DEAD 0
 #define ALIVE 1
@@ -37,5 +37,9 @@
 #define PRECHECKRANGE 2
 #define CALCGAMESHIFT 75
 #define MAX_BEGINING 30
-
+#define PROB_LAST_ATARI_HEURISTIC 0.9
+#define PROB_CAPTURE_HEURISTIC 0.9 
+#define PROB_SAVE_HEURISTIC 0.8
+#define PROB_PATTERN_HEURISTIC 0.95
+#define PROB_NAKADE_HEURISTIC 0.7
 #define MAXTIME 3*CLOCKS_PER_SEC
