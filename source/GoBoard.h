@@ -89,10 +89,13 @@ public:
 	//int check_one_Liberty(int i, int j);
 	//int find_one_Liberty_for_atari(int i, int j);
 	int last_atari_heuristic(int color);
+	int is_ladder(int point, int color);
+	int edge_distance(int cur_point);
 	//void try_to_save_by_eat(int neighbor_i,int neighbor_j,int* saves, int &saves_number);
 	//int find_one_Liberty_for_atari2(int bi, int bj, bool*checked);
 	int capture_heuristic(int color);
 	int save_heuristic(int color);
+	int save_heuristic2(int color);
 	int capture_move(int bi, int bj, int color);
 	//int gains_liberty(int move, int color);
 	int mogo_pattern_heuristic( int color);
@@ -106,6 +109,7 @@ public:
 	int total_liberties2(int point, int color, int *liberties, int enough, String *exclude);
 	bool is_self_atari(int point, int color);
 	int gains_liberty(int move, String* s);
+	int gains_liberty2(int move, String* s);
 	int add_point(int *points, int points_number, int point);
 	int add_string(String * strings[], int strings_number, String* string);
 	int total_liberties(int point, int color, int *liberties, int enough, String *exclude);

@@ -140,31 +140,49 @@ int GoBoard::save_heuristic(int color)
 	if (move >= 0)
 		return move;
 	else return -1;
-	//for (int k = 0; k < 4; ++k)
-	//{
-	//	ai = I(last_point) + deltai[k];
-	//	aj = J(last_point) + deltaj[k];
-	//	pos = POS(ai, aj);
-	//	if (on_board(ai, aj) && get_board(ai, aj) == color && board[pos]->get_liberties_number() <= 2)
-	//	{
-	//		for (int i = 0; i < board[pos]->get_liberties_number(); ++i)
-	//		{
-	//			int lib = board[pos]->get_liberty(i);
-	//			if (available(I(lib), J(lib), color) && gains_liberty(lib, board[pos]))
-	//			{
-	//				save_moves[save_moves_number++] = lib;
-	//			}
-	//		}
-	//	}
-	//}
-	//if (save_moves_number)
-	//{
-	//	return save_moves[rand()*save_moves_number / (RAND_MAX + 1)];
-	//}
-	//return -1;
 }
 
+int GoBoard::save_heuristic2(int color)
+{
+	if (last_point2 < 0)
+		return -1;
+	int save_moves[MAX_BOARD2];
+	int save_moves_number = 0;
+	String * neighbours[4];
+	int neighbour_number = 0;
+	int ai, aj;
+	for (int k = 0; k < 4; ++k)
+	{
+		ai = I(last_point2) + deltai[k];
+		aj = J(last_point2) + deltaj[k];
+		if (!on_board(ai, aj))
+			continue;
+		if (!board[POS(ai, aj)])
+			continue;
+		neighbour_number += add_string(neighbours, neighbour_number, board[POS(ai, aj)]);
+	}
+	for (int k = 0; k < neighbour_number; ++k)
+	{
+		if (neighbours[k]->get_color() == OTHER_COLOR(color) && neighbours[k]->get_liberties_number() == 2)
+		{
+			for (int i = 0; i < 2; ++i)
+			{
+				int lib = neighbours[k]->get_liberty(i);
+				save_moves_number += add_point(save_moves, save_moves_number, lib);
+			}
+		}
+	}
 
+	if (board[last_point2] && board[last_point2]->get_liberties_number() == 2)
+	{
+		save_moves_number = find_escape_point(board[last_point2], save_moves, save_moves_number);
+	}
+	int move = random_choose_move(save_moves, save_moves_number, color);
+	if (move >= 0)
+		return move;
+	else return -1;
+
+}
 
 
 int GoBoard::last_atari_heuristic(int color)
@@ -202,65 +220,8 @@ int GoBoard::last_atari_heuristic(int color)
 		last_atari[color] = -1;
 	}
 	return -1;
-	//int last_atari_moves[4];
-	//int last_atari_moves_number = 0;
 
-	//if (on_board(I(last_point), J(last_point)) && board[last_point] && board[last_point]->get_liberties_number() == 1)
-	//{
-	//	int lib = board[last_point]->get_liberty(0);
-	//	if (available(I(lib), J(lib), color) && gains_liberty(lib, board[last_point]))
-	//		last_atari_moves[last_atari_moves_number++] = lib;
-	//}
-	//if (on_board(I(last_point2), J(last_point2)) && board[last_point2] && board[last_point2]->get_liberties_number() == 1)
-	//{
-	//	int lib = board[last_point2]->get_liberty(0);
-	//	if (available(I(lib), J(lib), color) && gains_liberty(lib, board[last_point2]))
-	//		last_atari_moves[last_atari_moves_number++] = lib;
-	//}
-	//if (last_atari_moves_number)
-	//{
-	//	return last_atari_moves[rand()*last_atari_moves_number / (RAND_MAX + 1)];
-	//}
-	//return -1;
 }
-
-//bool GoBoard::match_mid(int i, int j, int my_color)
-//{
-//	int pos = POS(i, j);
-//	for (int start = 0; start < 8; start += 2)
-//	{
-//		String * around_points[8];
-//		for (int m = 0; m < 8; ++m)
-//		{
-//			around_points[m] =board[ POS(i + around_i[(start + m) % 8], j + around_j[(start + m) % 8])];
-//		}
-//		if (!around_points[1])
-//			continue;
-//		int this_color =around_points[1]->get_color();
-//		if (around_points[0] && around_points[0]->get_color() == OTHER_COLOR(this_color))
-//		{
-//			if (!around_points[3] && !around_points[7])
-//			{
-//				if (around_points[2] && around_points[2]->get_color() == OTHER_COLOR(this_color))
-//					return true;
-//				if (!around_points[2] && !around_points[5])
-//					return true;
-//			}
-//			if (!around_points[3] && !around_points[5] && around_points[7]
-//				&& around_points[7]->get_color() == OTHER_COLOR(this_color))
-//				return true;
-//			if (around_points[7] && around_points[7]->get_color() == this_color)
-//			{
-//				if (!(!around_points[5] && around_points[5] && around_points[5]->get_color() == this_color)
-//					&& !(!around_points[3] && around_points[5] && around_points[5]->get_color() == this_color))
-//					return true;
-//			}
-//
-//
-//		}
-//	}
-//
-//}
 
 bool GoBoard::match_hane(int i, int j, int my_color)
 {
@@ -350,57 +311,12 @@ bool GoBoard::match_hane(int i, int j, int my_color)
 	}
 
 
-	return false; //?
+	return false;
 }
-//bool GoBoard::match_cut1(int i, int j, int color) //symmetric
-//{
-//	for (int start = 0; start < 8; start += 2) //clock wise
-//	{
-//		bool color_same = false;
-//		if (!board[  POS(i+around_i[start],j+around_j[start] ) ])
-//			continue;
-//		if (board[POS(i + around_i[start], j + around_j[start])]->get_color() == BLACK)
-//			color_same = true;
-//		int bis[8];
-//		int bjs[8];
-//		for (int m = 0; m < 8; ++m) {
-//			bis[m] = i + around_i[(start + m) % 8];
-//			bjs[m] = j + around_j[(start + m) % 8];
-//		}
-//		if (color_same) {
-//			if (get_board(bis[3], bjs[3]) == WHITE &&
-//				get_board(bis[1], bjs[5]) == EMPTY)
-//				continue;
-//			if (get_board(bis[3], bjs[3]) == EMPTY &&
-//				get_board(bis[1], bjs[5]) == WHITE)
-//				continue;
-//
-//			if (get_board(bis[0], bjs[0]) == BLACK &&
-//				get_board(bis[1], bjs[1]) == WHITE &&
-//				get_board(bis[7], bjs[7]) == WHITE)
-//				return true;
-//		}
-//		else
-//		{
-//			if (get_board(bis[3], bjs[3]) == BLACK &&
-//				get_board(bis[1], bjs[5]) == EMPTY)
-//				continue;
-//			if (get_board(bis[3], bjs[3]) == EMPTY &&
-//				get_board(bis[1], bjs[5]) == BLACK)
-//				continue;
-//
-//			if (get_board(bis[0], bjs[0]) == WHITE &&
-//				get_board(bis[1], bjs[1]) == BLACK &&
-//				get_board(bis[7], bjs[7]) == BLACK)
-//				return true;
-//		}
-//	}
-//	return false;
-//
-//}
+
 bool GoBoard::match_cut2(int i, int j, int color) //symmetric
 {
-	for (int start = 0; start < 8; start += 2) //clock wise
+	for (int start = 0; start < 8; start += 2)
 	{
 		int around_points[8];
 		for (int m = 0; m < 8; ++m)
@@ -611,8 +527,7 @@ bool GoBoard::match_mogo_pattern(int bi, int bj, int color)
 	{
 		if (match_hane(bi, bj, color))
 			return true;
-		//if (match_cut1(bi, bj, color))
-		//	return true;
+
 		
 		if (match_cut2(bi, bj, color))
 			return true;

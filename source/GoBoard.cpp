@@ -533,9 +533,167 @@ int GoBoard::gains_liberty(int move, String* s)
 {
 	int cur_liberties = 1;
 	if (s) cur_liberties = s->get_liberties_number ();
-	int nlibs = total_liberties2(move, s->get_color(), 0, cur_liberties, s);
+	int nlibs = total_liberties(move, s->get_color(), 0, cur_liberties, s);
 	return nlibs > cur_liberties;
 }
+
+int GoBoard::edge_distance(int point)
+{
+	int d = board_size;
+	int i = I(point);
+	int j = J(point);
+	if (i < d)
+		d = i;
+	if (j < d)
+		d = j;
+	if (12 - i < d)
+		d = 12 - i;
+	if (12 - j < d)
+		d = 12 - j;
+	return d;
+}
+
+int GoBoard::is_ladder(int point, int color)
+{
+	if (total_liberties(point, color, 0,2,0) != 2) return false;
+	for (int i = 0; i < 4; ++i)
+	{
+		int ai = I(point) + deltai[i];
+		int aj = J(point) + deltaj[i];
+		if (!on_board(ai, aj))
+			continue;
+		if (board[POS(ai, aj)] && board[POS(ai, aj)]->get_color() == OTHER_COLOR(color) && board[POS(ai, aj)]->get_liberties_number() <= 2)
+			return false;
+	}
+
+	int liberties[4];
+	int liberties_number = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		int ai = I(point) + deltai[i];
+		int aj = J(point) + deltaj[i];
+		if (!on_board(ai, aj))
+			continue;
+		if (!board[POS(ai, aj)])
+			liberties[liberties_number++] = POS(ai, aj);
+	}
+	for (int i = 0; i < liberties_number; ++i)
+	{
+		int sec_libs[4];
+		int sec_libs_number = 0;
+		int delta[2] = { -1 };
+		for (int j = 0; j < 4; ++j)
+		{
+			int ai = I(liberties[i]) + deltai[j];
+			int aj = J(liberties[i]) + deltaj[j];
+			if (!on_board(ai, aj))
+				continue;
+			if (!board[POS(ai, aj)])
+				sec_libs[sec_libs_number++] = POS(ai, aj);
+		}
+		if (sec_libs_number == 4)
+			continue;
+		delta[0] = liberties[i] - point;
+		for (int j = 0; j < sec_libs_number; ++j)
+		{
+			if (sec_libs[j] != point &&sec_libs[j] != liberties[i] + delta[0])
+			{
+				delta[1] = sec_libs[j] - liberties[i];
+				break;
+			}
+		}
+		if (delta[1] == -1)
+			return true;
+		int cur_point = point, act = 0;
+		while (edge_distance(cur_point) > 1)
+		{
+			cur_point = cur_point + delta[act];
+			if (board[cur_point])
+			{
+				if (board[cur_point]->get_color() == color)
+					break;
+				else return true;
+			}
+			if (board[cur_point + delta[act]])
+			{
+				if (board[cur_point + delta[act]]->get_color() == color)
+					break;
+				else
+					return true;
+			}
+			act = 1 - act;
+		}
+		if (edge_distance(cur_point) < 2) return true;
+
+	}
+	return false;
+
+}
+
+//int GoBoard::gains_liberty(int move, String* string)
+//{
+//	int cur_liberty_number = string->get_liberties_number();
+//	int libs[MAX_BOARD2];
+//	int libs_number = 0;
+//	String* strings[4];
+//	int string_number = 0;
+//	bool belong_to_liberty = false;
+//	for (int i = 0; i < string->get_liberties_number(); ++i)
+//	{
+//		if (string->liberties[i] == move)
+//		{
+//			belong_to_liberty = true;
+//			break;
+//		}
+//	}
+//	for (int i = 0; i < 4; ++i)
+//	{
+//		int ai = I(move) + deltai[i];
+//		int aj = J(move) + deltaj[i];
+//		if (!on_board(ai, aj))
+//			continue;
+//		if (!board[POS(ai, aj)])
+//		{
+//			if (belong_to_liberty)
+//				libs[libs_number++] = POS(ai, aj);
+//		}
+//		else
+//		{
+//			string_number += add_string(strings, string_number, board[POS(ai, aj)]);
+//		}
+//	}
+//	if (libs_number>cur_liberty_number)  return true;
+//	for (int i = 0; i < string_number; ++i)
+//	{
+//		String* cur_string = strings[i];
+//		if (cur_string != string)
+//		{
+//			if (cur_string->get_color() == string->get_color())
+//			{
+//				for (int j = 0; j < cur_string->get_liberties_number(); ++j)
+//				{
+//					if (cur_string->liberties[j] != move)
+//					{
+//						if (belong_to_liberty)
+//						{
+//							libs_number += add_point(libs, libs_number, cur_string->liberties[j]);
+//							if (libs_number > cur_liberty_number) return true;
+//						}
+//					}
+//				}
+//			}
+//			else if (cur_string->get_liberties_number() == 1)
+//			{
+//				return true;
+//			}
+//		}
+//	}
+//	if (libs_number>cur_liberty_number) return true;
+//	else return false;
+//}
+
+
+
 int GoBoard::add_point(int *points, int points_number, int point)
 {
 	for (int i = 0; i < points_number; ++i)
@@ -737,6 +895,8 @@ int GoBoard::total_liberties(int point, int color, int *liberties, int enough, S
 	return libs_number;
 
 }
+
+
 
 bool GoBoard::available(int i, int j, int color)
 {
@@ -978,12 +1138,12 @@ int GoBoard::random_legal_move(int color)
 	int pos = rand()*board_size2 / (RAND_MAX + 1);
 	for (int i = pos; i < board_size2; ++i)
 	{
-		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color ) ) //&& !is_self_atari(i, color)
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color )  ) //&& !is_self_atari(i, color)
 			return i;
 	}
 	for (int i = 0; i < pos; ++i)
 	{
-		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color)) // && !is_self_atari(i, color)
+		if (available(I(i), J(i), color) &&!is_virtual_eye(i,color) ) //  && !is_self_atari(i, color)
 			return i;
 	}
 	return -1;
@@ -993,35 +1153,58 @@ int GoBoard::random_legal_move(int color)
 int GoBoard::select_and_play(int color)
 {
 	int move;
-
-
-
-	move = last_atari_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1)
+	int random_number;
+	random_number = rand() * 10000 / (RAND_MAX + 1);
+	if (1|| random_number < 10000 * PROB_LAST_ATARI_HEURISTIC)
 	{
-		play_move(I(move), J(move), color);
-		return move;
+		move = last_atari_heuristic(color);					//try to find a move that will capture the opponent
+		if (move != -1)
+		{
+			play_move(I(move), J(move), color);
+			return move;
+		}
+	}
+	random_number = rand() * 10000 / (RAND_MAX + 1);
+
+	if (1||random_number < 10000 * PROB_CAPTURE_HEURISTIC )
+	{
+		move = capture_heuristic(color);					//try to find a move that will capture the opponent
+		if (move != -1)
+		{
+			play_move(I(move), J(move), color);
+			return move;
+		}
 	}
 
-	move = save_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1)
+	random_number = rand() * 10000 / (RAND_MAX + 1);
+
+	if (1||random_number < 10000 * PROB_SAVE_HEURISTIC)
 	{
-		play_move(I(move), J(move), color);
-		return move;
+		move = save_heuristic(color);					//try to find a move that will capture the opponent
+		if (move != -1)
+		{
+			play_move(I(move), J(move), color);
+			return move;
+		}
+	}
+	//move = save_heuristic2(color);					//try to find a move that will capture the opponent
+	//if (move != -1)
+	//{
+	//	play_move(I(move), J(move), color);
+	//	return move;
+	//}
+	random_number = rand() * 10000 / (RAND_MAX + 1);
+	if (1||random_number < 10000 * PROB_PATTERN_HEURISTIC)
+	{
+		move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
+		if (move != -1)
+		{
+			play_move(I(move), J(move), color);
+			return move;
+		}
 	}
 
-	move = mogo_pattern_heuristic(color);  // check whether the opponent's last move's around_eight_moves match a pattern, if match ,chose it.
-	if (move != -1)
-	{
-		play_move(I(move), J(move), color);
-		return move;
-	}
-	move = capture_heuristic(color);					//try to find a move that will capture the opponent
-	if (move != -1)
-	{
-		play_move(I(move), J(move), color);
-		return move;
-	}
+
 	move = random_legal_move(color);			//select a random  legal move
 	if (move != -1)
 	{
@@ -1166,13 +1349,13 @@ int GoBoard::random_choose_move(int * moves, int number_moves,int color)
 	for (int i = pos; i < number_moves; ++i)
 	{
 		int move = moves[i];
-		if (available(I(move), J(move), color) && !is_virtual_eye(move, color)&&!is_self_atari(move,color) )
+		if (available(I(move), J(move), color) && !is_virtual_eye(move, color) && !is_self_atari(move, color)  )// && !is_ladder(move, color)
 			return move;
 	}
 	for (int i = 0; i < pos; ++i)
 	{
 		int move = moves[i];
-		if (available(I(move), J(move), color) && !is_virtual_eye(move, color) &&!is_self_atari(move,color))
+		if (available(I(move), J(move), color) && !is_virtual_eye(move, color) &&!is_self_atari(move,color) ) //&& !is_ladder(move, color)
 			return move ;
 	}
 	return -1;

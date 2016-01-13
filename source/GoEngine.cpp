@@ -435,7 +435,7 @@ void GoEngine::aiMove(int *pos, int color, int *moves, int num_moves)
 	//aiMovePreCheck(pos, color, moves, num_moves);
 	//if (*pos == -1)
 	//aiMoveStart(pos, color);
-	if (*pos == -1)
+	//if (*pos == -1)
 		uctSearch(pos, color, moves, num_moves);
 }
 
@@ -444,7 +444,14 @@ void GoEngine::aiMoveStart(int *pos, int color)
 	if (go_board->step < MAX_BEGINING)
 	{
 		int move;
-
+		move = go_board->last_atari_heuristic(color);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->capture_heuristic(color);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->save_heuristic(color);
+		if (move != -1) { *pos = move; return; }
+		move = go_board->mogo_pattern_heuristic(color);
+		if (move != -1) { *pos = move; return; }
 		move = go_board->is_xiaomu_available(color, go_board->last_point);
 		if (move != -1) { *pos = move; return; }
 		move = go_board->is_anti_kakari_available(color, go_board->last_point);
